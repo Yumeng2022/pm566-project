@@ -6,7 +6,7 @@ output: github_document
 always_allow_html: true
 ---
 
-### Prepare the library--> DELETE!
+### Prepare the library--> DELETE?
 ```{r}
 library(dplyr)
 library(tidyverse)
@@ -19,24 +19,44 @@ library(cowplot)
 ```
 
 
+
+
+
+
 # Data Wrangling
 
-### Download and read in csv.
+### Download dataset from CDC's website and read it in.
 
-Dataset Name: DASH - Youth Risk Behavior Surveillance System (YRBSS): Middle School
+DASH YRBSS - Alcohol and Other Drug Use (MS): https://chronicdata.cdc.gov/Youth-Risk-Behaviors/DASH-YRBSS-Alcohol-and-Other-Drug-Use-MS-/bdg5-rnzz
 
-Export Address: https://chronicdata.cdc.gov/Youth-Risk-Behaviors/DASH-Youth-Risk-Behavior-Surveillance-System-YRBSS/k5bc-k3g8
-
-Too big (272.6 MB) to upload.
+* This dataset was subtracted from DASH - Youth Risk Behavior Surveillance System (YRBSS): Middle School (https://chronicdata.cdc.gov/Youth-Risk-Behaviors/DASH-Youth-Risk-Behavior-Surveillance-System-YRBSS/k5bc-k3g8).
 
 ```{r}
-mid <- data.table::fread("/Users/gao/Desktop/566 Midterm/YRBSS.csv")
+if (!file.exists("YRBSS_MS.csv")) {
+  download.file(
+    url = "https://chronicdata.cdc.gov/api/views/bdg5-rnzz/rows.csv?accessType=DOWNLOAD", "YRBSS_MS.csv", method = "libcurl", timeout  = 60)
+}
+ms= data.table::fread("YRBSS_MS.csv")
+```
+
+
+# Exploratory Data Analysis
+1. Formulate a question
+2. Read in the data
+3. Check the dimensions and headers and footers of the data
+```{r}
+dim(ms)
+head(ms)
+tail(ms)
+str(ms)
 ```
 
 
 
-
-
+4. Check the variable types in the data
+5. Take a closer look at some/all of the variables
+6. Validate with an external source
+7. Conduct some summary statistics to answer the initial question - Make exploratory graphs
 
 
 
