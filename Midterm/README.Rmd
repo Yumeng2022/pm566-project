@@ -1,16 +1,43 @@
 ---
-title: "PM566 Midterm Project"
+title: "Important Causes of Death in US"
 author: "Yumeng Gao"
 date: "`r Sys.Date()`"
 output: github_document
 always_allow_html: true
 ---
 
+# Introduction
+
+# Methods
+
+# Preliminary Results
+
+# Conclusion
+
+
+
+
+
+
+
+> Exploratory Data Analysis
+
+1. Formulate a question
+2. Read in the data
+3. Check the dimensions and headers and footers of the data
+5. Take a closer look at some/all of the variables
+6. Validate with an external source
+7. Conduct some summary statistics to answer the initial question - Make exploratory graphs
+
+
+
+
 ### Prepare the library--> DELETE?
 ```{r}
-library(dplyr)
-library(tidyverse)
 library(data.table)
+library(dplyr)
+library(dtplyr)
+library(tidyverse)
 library(R.utils)
 library(lubridate)
 library(leaflet)
@@ -20,64 +47,78 @@ library(cowplot)
 
 
 
-
-
-
-# Data Wrangling
-
 ### Download dataset from CDC's website and read it in.
 
-DASH YRBSS - Alcohol and Other Drug Use (MS): https://chronicdata.cdc.gov/Youth-Risk-Behaviors/DASH-YRBSS-Alcohol-and-Other-Drug-Use-MS-/bdg5-rnzz
 
-* This dataset was subtracted from DASH - Youth Risk Behavior Surveillance System (YRBSS): Middle School (https://chronicdata.cdc.gov/Youth-Risk-Behaviors/DASH-Youth-Risk-Behavior-Surveillance-System-YRBSS/k5bc-k3g8).
+AH Monthly Provisional Counts of Deaths for Select Causes of Death by Sex, Age, and Race and Hispanic Origin
+(https://data.cdc.gov/NCHS/AH-Monthly-Provisional-Counts-of-Deaths-for-Select/65mz-jvh5)
+
+Provisional counts of deaths by the month the deaths occurred, by age group, sex, and race/ethnicity, for select underlying causes of death for 2020-2021. Final data are provided for 2019. The dataset also includes monthly provisional counts of death for COVID-19, coded to ICD-10 code U07.1 as an underlying or multiple cause of death.
+
 
 ```{r}
-if (!file.exists("YRBSS_MS.csv")) {
+if (!file.exists("deaths.csv")) {
   download.file(
-    url = "https://chronicdata.cdc.gov/api/views/bdg5-rnzz/rows.csv?accessType=DOWNLOAD", "YRBSS_MS.csv", method = "libcurl", timeout  = 60)
+    url = "https://data.cdc.gov/api/views/65mz-jvh5/rows.csv?accessType=DOWNLOAD", "deaths.csv", method = "libcurl", timeout  = 60)
 }
-ms= data.table::fread("YRBSS_MS.csv")
+ah= data.table::fread("deaths.csv")
 ```
 
 
-# Exploratory Data Analysis
-1. Formulate a question
-2. Read in the data
-3. Check the dimensions and headers and footers of the data
+
 ```{r}
-dim(ms)
-head(ms)
-tail(ms)
-str(ms)
+dim(ah)
+head(ah)
+tail(ah)
 ```
-
-
 
 4. Check the variable types in the data
-5. Take a closer look at some/all of the variables
-6. Validate with an external source
-7. Conduct some summary statistics to answer the initial question - Make exploratory graphs
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
-
+str(ah)
 ```
 
+Change the names of the key variables so that they are easier to refer to in your code.
 ```{r}
+setnames(ah, old = c('Date Of Death Year', 'Date Of Death Month', 'Race/Ethnicity' ,'Septicemia (A40-A41)', 'Malignant neoplasms (C00-C97)', 'Diabetes mellitus (E10-E14)', 'Alzheimer disease (G30)', 'Influenza and pneumonia (J09-J18)', 'Chronic lower respiratory diseases (J40-J47)', 'Other diseases of respiratory system (J00-J06,J30-J39,J67,J70-J98)', 'Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)','Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified (R00-R99)', 'Diseases of heart (I00-I09,I11,I13,I20-I51)' ,'Cerebrovascular diseases (I60-I69)' ,'COVID-19 (U071, Multiple Cause of Death)' ,'COVID-19 (U071, Underlying Cause of Death)'), new = c('Year', 'Month', 'Race', 'Septicemia', 'Tumor', 'Diabetes', 'Alzheimer', 'Flu&Pneumonia', 'Lower_R','Other_R' ,'Nephrosis', 'Abnormal', 'Heart', 'Cerebrovascular', 'Covid_Multi' ,'Covid_Under'))
+```
 
+
+```{r}
+str(ah)
+```
+
+
+Categorical Variables
+```{r}
+ah$Year= as.character(ah$Year)
+ah$Month= as.character(ah$Month)
+is.char= sapply(ah, is.character)
+cate= ah[, ..is.char]
+apply(cate, 2, table)
+```
+
+Fix sex's problem.
+```{r}
+ah= tibble::rowid_to_column(ah, "ID")
+for (i in 1:length(ah$ID)){
+  if (ah$Sex[i]== 'Female'){
+    ah$Sex[i]= 'F'
+  } else if (ah$Sex[i]== 'Male'){
+    ah$Sex[i]= 'M'}
+}
+table(ah$Sex)
+```
+
+
+Numerical Variables
+```{r}
+is.inte= sapply(ah, is.integer)
+inte= ah[, ..is.inte]
+apply(inte, 2, summary)
+```
+By year of death?
+```{r}
+apply(inte, 2, hist)
 ```
 
 
