@@ -1,7 +1,7 @@
-Important Causes of Death in US
+Leading Causes of Death in US
 ================
 Yumeng Gao
-2022-10-19
+2022-10-22
 
 # Introduction
 
@@ -10,6 +10,11 @@ Yumeng Gao
 # Preliminary Results
 
 # Conclusion
+
+-   Mortality comparison among 3 years (overall, by sex, by age, and by
+    race)
+-   Mortality comparison among different causes (adding proportions?)
+-   The influence of Covid-19 causes (multiple & underlying)
 
 > Exploratory Data Analysis
 
@@ -141,8 +146,8 @@ Sex, Age, and Race and Hispanic Origin
 Provisional counts of deaths by the month the deaths occurred, by age
 group, sex, and race/ethnicity, for select underlying causes of death
 for 2020-2021. Final data are provided for 2019. The dataset also
-includes monthly provisional counts of death for COVID-19, coded to
-ICD-10 code U07.1 as an underlying or multiple cause of death.
+includes monthly provisional counts of death for COVID-19, as an
+underlying or multiple cause of death.
 
 ``` r
 if (!file.exists("deaths.csv")) {
@@ -370,7 +375,7 @@ str(ah)
     ##  - attr(*, ".internal.selfref")=<externalptr>
 
 Change the names of the key variables so that they are easier to refer
-to in your code.
+to in the code.
 
 ``` r
 setnames(ah, old = c('Date Of Death Year', 'Date Of Death Month', 'Race/Ethnicity' ,'Septicemia (A40-A41)', 'Malignant neoplasms (C00-C97)', 'Diabetes mellitus (E10-E14)', 'Alzheimer disease (G30)', 'Influenza and pneumonia (J09-J18)', 'Chronic lower respiratory diseases (J40-J47)', 'Other diseases of respiratory system (J00-J06,J30-J39,J67,J70-J98)', 'Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)','Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified (R00-R99)', 'Diseases of heart (I00-I09,I11,I13,I20-I51)' ,'Cerebrovascular diseases (I60-I69)' ,'COVID-19 (U071, Multiple Cause of Death)' ,'COVID-19 (U071, Underlying Cause of Death)'), new = c('Year', 'Month', 'Race', 'Septicemia', 'Tumor', 'Diabetes', 'Alzheimer', 'Flu&Pneumonia', 'Lower_R','Other_R' ,'Nephrosis', 'Abnormal', 'Heart', 'Cerebrovascular', 'Covid_Multi' ,'Covid_Under'))
@@ -410,8 +415,8 @@ str(ah)
 Categorical Variables
 
 ``` r
-ah$Year= as.character(ah$Year)
-ah$Month= as.character(ah$Month)
+ah$Y= as.character(ah$Year)
+ah$M= as.character(ah$Month)
 is.char= sapply(ah, is.character)
 cate= ah[, ..is.char]
 apply(cate, 2, table)
@@ -421,16 +426,6 @@ apply(cate, 2, table)
     ## 
     ## 10/13/2021 
     ##       3960 
-    ## 
-    ## $Year
-    ## 
-    ## 2019 2020 2021 
-    ## 1440 1440 1080 
-    ## 
-    ## $Month
-    ## 
-    ##   1  10  11  12   2   3   4   5   6   7   8   9 
-    ## 360 240 240 240 360 360 360 360 360 360 360 360 
     ## 
     ## $`Start Date`
     ## 
@@ -490,18 +485,30 @@ apply(cate, 2, table)
     ##       45-54 years        5-14 years       55-64 years       65-74 years 
     ##               396               396               396               396 
     ##       75-84 years 85 years and over 
-    ##               396               396
+    ##               396               396 
+    ## 
+    ## $Y
+    ## 
+    ## 2019 2020 2021 
+    ## 1440 1440 1080 
+    ## 
+    ## $M
+    ## 
+    ##   1  10  11  12   2   3   4   5   6   7   8   9 
+    ## 360 240 240 240 360 360 360 360 360 360 360 360
 
-Fix sex’s problem.
+Fix Sex’s problem.
 
 ``` r
 ah= tibble::rowid_to_column(ah, "ID")
+
 for (i in 1:length(ah$ID)){
   if (ah$Sex[i]== 'Female'){
     ah$Sex[i]= 'F'
   } else if (ah$Sex[i]== 'Male'){
     ah$Sex[i]= 'M'}
 }
+
 table(ah$Sex)
 ```
 
@@ -512,430 +519,48 @@ table(ah$Sex)
 Numerical Variables
 
 ``` r
-is.inte= sapply(ah, is.integer)
-inte= ah[, ..is.inte]
-apply(inte, 2, summary)
+summary(ah[,11:25])
 ```
 
-    ##              ID  AllCause NaturalCause Septicemia     Tumor   Diabetes
-    ## Min.       1.00     0.000        0.000    0.00000    0.0000    0.00000
-    ## 1st Qu.  990.75    73.000       45.000    0.00000    5.0000    0.00000
-    ## Median  1980.50   247.000      187.000    2.00000   30.0000    8.00000
-    ## Mean    1980.50  2198.036     2013.428   27.07374  413.9745   66.22273
-    ## 3rd Qu. 2970.25  1423.500     1111.000   15.00000  212.2500   50.00000
-    ## Max.    3960.00 55227.000    53946.000  484.00000 6541.0000 1039.00000
-    ##          Alzheimer Flu&Pneumonia   Lower_R   Other_R Nephrosis   Abnormal
-    ## Min.       0.00000       0.00000    0.0000   0.00000   0.00000    0.00000
-    ## 1st Qu.    0.00000       0.00000    0.0000   0.00000   0.00000    1.00000
-    ## Median     0.00000       3.00000    4.0000   2.00000   3.00000    5.00000
-    ## Mean      86.24571      33.34848  103.5874  30.74773  36.04242   33.06465
-    ## 3rd Qu.    6.00000      19.00000   22.0000  14.00000  20.00000   22.25000
-    ## Max.    4844.00000    1216.00000 2408.0000 665.00000 651.00000 1308.00000
-    ##              Heart Cerebrovascular Covid_Multi Covid_Under
-    ## Min.        0.0000          0.0000      0.0000      0.0000
-    ## 1st Qu.     3.0000          1.0000      0.0000      0.0000
-    ## Median     29.0000          6.0000      0.0000      0.0000
-    ## Mean      465.9268        107.7025    179.1823    162.4818
-    ## 3rd Qu.   212.0000         56.0000     37.0000     33.0000
-    ## Max.    11502.0000       3483.0000  15441.0000  13510.0000
-
-By year of death?
+    ##     AllCause      NaturalCause     Septicemia         Tumor       
+    ##  Min.   :    0   Min.   :    0   Min.   :  0.00   Min.   :   0.0  
+    ##  1st Qu.:   73   1st Qu.:   45   1st Qu.:  0.00   1st Qu.:   5.0  
+    ##  Median :  247   Median :  187   Median :  2.00   Median :  30.0  
+    ##  Mean   : 2198   Mean   : 2013   Mean   : 27.07   Mean   : 414.0  
+    ##  3rd Qu.: 1424   3rd Qu.: 1111   3rd Qu.: 15.00   3rd Qu.: 212.2  
+    ##  Max.   :55227   Max.   :53946   Max.   :484.00   Max.   :6541.0  
+    ##     Diabetes         Alzheimer       Flu&Pneumonia        Lower_R      
+    ##  Min.   :   0.00   Min.   :   0.00   Min.   :   0.00   Min.   :   0.0  
+    ##  1st Qu.:   0.00   1st Qu.:   0.00   1st Qu.:   0.00   1st Qu.:   0.0  
+    ##  Median :   8.00   Median :   0.00   Median :   3.00   Median :   4.0  
+    ##  Mean   :  66.22   Mean   :  86.25   Mean   :  33.35   Mean   : 103.6  
+    ##  3rd Qu.:  50.00   3rd Qu.:   6.00   3rd Qu.:  19.00   3rd Qu.:  22.0  
+    ##  Max.   :1039.00   Max.   :4844.00   Max.   :1216.00   Max.   :2408.0  
+    ##     Other_R         Nephrosis         Abnormal           Heart        
+    ##  Min.   :  0.00   Min.   :  0.00   Min.   :   0.00   Min.   :    0.0  
+    ##  1st Qu.:  0.00   1st Qu.:  0.00   1st Qu.:   1.00   1st Qu.:    3.0  
+    ##  Median :  2.00   Median :  3.00   Median :   5.00   Median :   29.0  
+    ##  Mean   : 30.75   Mean   : 36.04   Mean   :  33.06   Mean   :  465.9  
+    ##  3rd Qu.: 14.00   3rd Qu.: 20.00   3rd Qu.:  22.25   3rd Qu.:  212.0  
+    ##  Max.   :665.00   Max.   :651.00   Max.   :1308.00   Max.   :11502.0  
+    ##  Cerebrovascular   Covid_Multi       Covid_Under     
+    ##  Min.   :   0.0   Min.   :    0.0   Min.   :    0.0  
+    ##  1st Qu.:   1.0   1st Qu.:    0.0   1st Qu.:    0.0  
+    ##  Median :   6.0   Median :    0.0   Median :    0.0  
+    ##  Mean   : 107.7   Mean   :  179.2   Mean   :  162.5  
+    ##  3rd Qu.:  56.0   3rd Qu.:   37.0   3rd Qu.:   33.0  
+    ##  Max.   :3483.0   Max.   :15441.0   Max.   :13510.0
 
 ``` r
-apply(inte, 2, hist)
+avg_m= as.data.table(group_by(ah, Year, Month) %>% summarize( AllCause= mean(AllCause), NaturalCause= mean(NaturalCause), Septicemia= mean(Septicemia),Tumor= mean(Tumor)))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-3.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-4.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-5.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-6.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-7.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-8.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-9.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-10.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-11.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-12.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-13.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-14.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-15.png)<!-- -->![](README_files/figure-gfm/unnamed-chunk-10-16.png)<!-- -->
+    ## `summarise()` has grouped output by 'Year'. You can override using the `.groups`
+    ## argument.
 
-    ## $ID
-    ## $breaks
-    ## [1]    0  500 1000 1500 2000 2500 3000 3500 4000
-    ## 
-    ## $counts
-    ## [1] 500 500 500 500 500 500 500 460
-    ## 
-    ## $density
-    ## [1] 0.0002525253 0.0002525253 0.0002525253 0.0002525253 0.0002525253
-    ## [6] 0.0002525253 0.0002525253 0.0002323232
-    ## 
-    ## $mids
-    ## [1]  250  750 1250 1750 2250 2750 3250 3750
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $AllCause
-    ## $breaks
-    ##  [1]     0  5000 10000 15000 20000 25000 30000 35000 40000 45000 50000 55000
-    ## [13] 60000
-    ## 
-    ## $counts
-    ##  [1] 3648   78   40   33   87   30   15   18    7    2    1    1
-    ## 
-    ## $density
-    ##  [1] 1.842424e-04 3.939394e-06 2.020202e-06 1.666667e-06 4.393939e-06
-    ##  [6] 1.515152e-06 7.575758e-07 9.090909e-07 3.535354e-07 1.010101e-07
-    ## [11] 5.050505e-08 5.050505e-08
-    ## 
-    ## $mids
-    ##  [1]  2500  7500 12500 17500 22500 27500 32500 37500 42500 47500 52500 57500
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $NaturalCause
-    ## $breaks
-    ##  [1]     0  5000 10000 15000 20000 25000 30000 35000 40000 45000 50000 55000
-    ## 
-    ## $counts
-    ##  [1] 3680   46   45   34   92   21   15   20    4    1    2
-    ## 
-    ## $density
-    ##  [1] 1.858586e-04 2.323232e-06 2.272727e-06 1.717172e-06 4.646465e-06
-    ##  [6] 1.060606e-06 7.575758e-07 1.010101e-06 2.020202e-07 5.050505e-08
-    ## [11] 1.010101e-07
-    ## 
-    ## $mids
-    ##  [1]  2500  7500 12500 17500 22500 27500 32500 37500 42500 47500 52500
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $Septicemia
-    ## $breaks
-    ##  [1]   0  50 100 150 200 250 300 350 400 450 500
-    ## 
-    ## $counts
-    ##  [1] 3451  245   19   45   23   77   68   24    6    2
-    ## 
-    ## $density
-    ##  [1] 1.742929e-02 1.237374e-03 9.595960e-05 2.272727e-04 1.161616e-04
-    ##  [6] 3.888889e-04 3.434343e-04 1.212121e-04 3.030303e-05 1.010101e-05
-    ## 
-    ## $mids
-    ##  [1]  25  75 125 175 225 275 325 375 425 475
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $Tumor
-    ## $breaks
-    ##  [1]    0  500 1000 1500 2000 2500 3000 3500 4000 4500 5000 5500 6000 6500 7000
-    ## 
-    ## $counts
-    ##  [1] 3412  268   16    0    1   19   49   63    2   34   33   29   33    1
-    ## 
-    ## $density
-    ##  [1] 1.723232e-03 1.353535e-04 8.080808e-06 0.000000e+00 5.050505e-07
-    ##  [6] 9.595960e-06 2.474747e-05 3.181818e-05 1.010101e-06 1.717172e-05
-    ## [11] 1.666667e-05 1.464646e-05 1.666667e-05 5.050505e-07
-    ## 
-    ## $mids
-    ##  [1]  250  750 1250 1750 2250 2750 3250 3750 4250 4750 5250 5750 6250 6750
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $Diabetes
-    ## $breaks
-    ##  [1]    0  100  200  300  400  500  600  700  800  900 1000 1100
-    ## 
-    ## $counts
-    ##  [1] 3270  371   74   14   43  101   24   29   23   10    1
-    ## 
-    ## $density
-    ##  [1] 8.257576e-03 9.368687e-04 1.868687e-04 3.535354e-05 1.085859e-04
-    ##  [6] 2.550505e-04 6.060606e-05 7.323232e-05 5.808081e-05 2.525253e-05
-    ## [11] 2.525253e-06
-    ## 
-    ## $mids
-    ##  [1]   50  150  250  350  450  550  650  750  850  950 1050
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $Alzheimer
-    ## $breaks
-    ##  [1]    0  500 1000 1500 2000 2500 3000 3500 4000 4500 5000
-    ## 
-    ## $counts
-    ##  [1] 3828   27   43   29    0    0    6   11   13    3
-    ## 
-    ## $density
-    ##  [1] 1.933333e-03 1.363636e-05 2.171717e-05 1.464646e-05 0.000000e+00
-    ##  [6] 0.000000e+00 3.030303e-06 5.555556e-06 6.565657e-06 1.515152e-06
-    ## 
-    ## $mids
-    ##  [1]  250  750 1250 1750 2250 2750 3250 3750 4250 4750
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $`Flu&Pneumonia`
-    ## $breaks
-    ##  [1]    0  100  200  300  400  500  600  700  800  900 1000 1100 1200 1300
-    ## 
-    ## $counts
-    ##  [1] 3700   66   57   52   39   19   10    6    5    1    1    3    1
-    ## 
-    ## $density
-    ##  [1] 9.343434e-03 1.666667e-04 1.439394e-04 1.313131e-04 9.848485e-05
-    ##  [6] 4.797980e-05 2.525253e-05 1.515152e-05 1.262626e-05 2.525253e-06
-    ## [11] 2.525253e-06 7.575758e-06 2.525253e-06
-    ## 
-    ## $mids
-    ##  [1]   50  150  250  350  450  550  650  750  850  950 1050 1150 1250
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $Lower_R
-    ## $breaks
-    ##  [1]    0  200  400  600  800 1000 1200 1400 1600 1800 2000 2200 2400 2600
-    ## 
-    ## $counts
-    ##  [1] 3696    0   29   36    4   29   47   42   40   17   13    5    2
-    ## 
-    ## $density
-    ##  [1] 4.666667e-03 0.000000e+00 3.661616e-05 4.545455e-05 5.050505e-06
-    ##  [6] 3.661616e-05 5.934343e-05 5.303030e-05 5.050505e-05 2.146465e-05
-    ## [11] 1.641414e-05 6.313131e-06 2.525253e-06
-    ## 
-    ## $mids
-    ##  [1]  100  300  500  700  900 1100 1300 1500 1700 1900 2100 2300 2500
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $Other_R
-    ## $breaks
-    ##  [1]   0  50 100 150 200 250 300 350 400 450 500 550 600 650 700
-    ## 
-    ## $counts
-    ##  [1] 3637   62   47   15    8   19   24   46   40   27   19   11    4    1
-    ## 
-    ## $density
-    ##  [1] 1.836869e-02 3.131313e-04 2.373737e-04 7.575758e-05 4.040404e-05
-    ##  [6] 9.595960e-05 1.212121e-04 2.323232e-04 2.020202e-04 1.363636e-04
-    ## [11] 9.595960e-05 5.555556e-05 2.020202e-05 5.050505e-06
-    ## 
-    ## $mids
-    ##  [1]  25  75 125 175 225 275 325 375 425 475 525 575 625 675
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $Nephrosis
-    ## $breaks
-    ##  [1]   0  50 100 150 200 250 300 350 400 450 500 550 600 650 700
-    ## 
-    ## $counts
-    ##  [1] 3353  250  134   24   15   22   27   26   25   32   29   17    5    1
-    ## 
-    ## $density
-    ##  [1] 1.693434e-02 1.262626e-03 6.767677e-04 1.212121e-04 7.575758e-05
-    ##  [6] 1.111111e-04 1.363636e-04 1.313131e-04 1.262626e-04 1.616162e-04
-    ## [11] 1.464646e-04 8.585859e-05 2.525253e-05 5.050505e-06
-    ## 
-    ## $mids
-    ##  [1]  25  75 125 175 225 275 325 375 425 475 525 575 625 675
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $Abnormal
-    ## $breaks
-    ##  [1]    0  100  200  300  400  500  600  700  800  900 1000 1100 1200 1300 1400
-    ## 
-    ## $counts
-    ##  [1] 3639  159   83   22   10   23   15    1    1    2    3    1    0    1
-    ## 
-    ## $density
-    ##  [1] 9.189394e-03 4.015152e-04 2.095960e-04 5.555556e-05 2.525253e-05
-    ##  [6] 5.808081e-05 3.787879e-05 2.525253e-06 2.525253e-06 5.050505e-06
-    ## [11] 7.575758e-06 2.525253e-06 0.000000e+00 2.525253e-06
-    ## 
-    ## $mids
-    ##  [1]   50  150  250  350  450  550  650  750  850  950 1050 1150 1250 1350
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $Heart
-    ## $breaks
-    ##  [1]     0  1000  2000  3000  4000  5000  6000  7000  8000  9000 10000 11000
-    ## [13] 12000
-    ## 
-    ## $counts
-    ##  [1] 3626  103   31   37   38   41   32   16    5   16    7    8
-    ## 
-    ## $density
-    ##  [1] 9.156566e-04 2.601010e-05 7.828283e-06 9.343434e-06 9.595960e-06
-    ##  [6] 1.035354e-05 8.080808e-06 4.040404e-06 1.262626e-06 4.040404e-06
-    ## [11] 1.767677e-06 2.020202e-06
-    ## 
-    ## $mids
-    ##  [1]   500  1500  2500  3500  4500  5500  6500  7500  8500  9500 10500 11500
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $Cerebrovascular
-    ## $breaks
-    ##  [1]    0  200  400  600  800 1000 1200 1400 1600 1800 2000 2200 2400 2600 2800
-    ## [16] 3000 3200 3400 3600
-    ## 
-    ## $counts
-    ##  [1] 3550  195   22   51   10   13   49   34    3    0    0    0    1    7   13
-    ## [16]    7    4    1
-    ## 
-    ## $density
-    ##  [1] 4.482323e-03 2.462121e-04 2.777778e-05 6.439394e-05 1.262626e-05
-    ##  [6] 1.641414e-05 6.186869e-05 4.292929e-05 3.787879e-06 0.000000e+00
-    ## [11] 0.000000e+00 0.000000e+00 1.262626e-06 8.838384e-06 1.641414e-05
-    ## [16] 8.838384e-06 5.050505e-06 1.262626e-06
-    ## 
-    ## $mids
-    ##  [1]  100  300  500  700  900 1100 1300 1500 1700 1900 2100 2300 2500 2700 2900
-    ## [16] 3100 3300 3500
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $Covid_Multi
-    ## $breaks
-    ##  [1]     0  1000  2000  3000  4000  5000  6000  7000  8000  9000 10000 11000
-    ## [13] 12000 13000 14000 15000 16000
-    ## 
-    ## $counts
-    ##  [1] 3795   84   35   16    8    7    2    2    5    0    1    3    0    1    0
-    ## [16]    1
-    ## 
-    ## $density
-    ##  [1] 9.583333e-04 2.121212e-05 8.838384e-06 4.040404e-06 2.020202e-06
-    ##  [6] 1.767677e-06 5.050505e-07 5.050505e-07 1.262626e-06 0.000000e+00
-    ## [11] 2.525253e-07 7.575758e-07 0.000000e+00 2.525253e-07 0.000000e+00
-    ## [16] 2.525253e-07
-    ## 
-    ## $mids
-    ##  [1]   500  1500  2500  3500  4500  5500  6500  7500  8500  9500 10500 11500
-    ## [13] 12500 13500 14500 15500
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
-    ## 
-    ## $Covid_Under
-    ## $breaks
-    ##  [1]     0  1000  2000  3000  4000  5000  6000  7000  8000  9000 10000 11000
-    ## [13] 12000 13000 14000
-    ## 
-    ## $counts
-    ##  [1] 3808   81   32   14    9    1    3    5    1    1    3    1    0    1
-    ## 
-    ## $density
-    ##  [1] 9.616162e-04 2.045455e-05 8.080808e-06 3.535354e-06 2.272727e-06
-    ##  [6] 2.525253e-07 7.575758e-07 1.262626e-06 2.525253e-07 2.525253e-07
-    ## [11] 7.575758e-07 2.525253e-07 0.000000e+00 2.525253e-07
-    ## 
-    ## $mids
-    ##  [1]   500  1500  2500  3500  4500  5500  6500  7500  8500  9500 10500 11500
-    ## [13] 12500 13500
-    ## 
-    ## $xname
-    ## [1] "newX[, i]"
-    ## 
-    ## $equidist
-    ## [1] TRUE
-    ## 
-    ## attr(,"class")
-    ## [1] "histogram"
+``` r
+ggplot(data = avg_m)+
+ geom_line(mapping=aes(x= Month, y= NaturalCause, group= Year, color= Year))
+```
+
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
