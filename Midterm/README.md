@@ -2,7 +2,7 @@ Analysis of Current Death Counts and Leading Causes in the US, focusing
 on COVID-19
 ================
 Yumeng Gao
-2022-10-23
+2022-10-24
 
 # Introduction
 
@@ -19,8 +19,9 @@ picture of COVID-19-attributed mortality with other leading causes of
 death, to quantify the influence of this pandemic. This study focused on
 the overall death counts in the US and leading causes, then narrowed
 down to COVID-caused death counts in different age, sex, and race
-groups. The primary research question was to what extent is the impact
-of COVID-19 on mortality currently.
+groups. The primary research questions were have the effect of leading
+causes changed from 2019 to 2021 and how is COVID-caused mortality
+related to sex, age, and race.
 
 # Methods
 
@@ -64,7 +65,10 @@ Death), 14. COVID-19 ( Underlying Cause of Death)
 All Causes was also collected, however, it was not equal to the sum of
 these individual causes, so the proportions were unable to calculate.
 
-Download dataset from CDC’s website and read it in.
+Noted that this dataset contained data from Jan 2019 to Sep 2021 (totall
+33 months).
+
+-   Download dataset from CDC’s website and read it in.
 
 ``` r
 if (!file.exists("deaths.csv")) {
@@ -74,8 +78,8 @@ if (!file.exists("deaths.csv")) {
 ah= data.table::fread("deaths.csv")
 ```
 
-Change the names of the key variables so that they are easier to refer
-to in the code.
+-   Change the names of the key variables so that they are easier to
+    refer to in the code.
 
 ``` r
 setnames(ah, old = c('Date Of Death Year', 'Date Of Death Month', 'Race/Ethnicity' ,'Septicemia (A40-A41)', 'Malignant neoplasms (C00-C97)', 'Diabetes mellitus (E10-E14)', 'Alzheimer disease (G30)', 'Influenza and pneumonia (J09-J18)', 'Chronic lower respiratory diseases (J40-J47)', 'Other diseases of respiratory system (J00-J06,J30-J39,J67,J70-J98)', 'Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)','Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified (R00-R99)', 'Diseases of heart (I00-I09,I11,I13,I20-I51)' ,'Cerebrovascular diseases (I60-I69)' ,'COVID-19 (U071, Multiple Cause of Death)' ,'COVID-19 (U071, Underlying Cause of Death)'), new = c('Y', 'M', 'Race', 'Septicemia', 'Tumor', 'Diabetes', 'Alzheimer', 'FluPneumonia', 'Lower_R','Other_R' ,'Nephrosis', 'Abnormal', 'Heart', 'Cerebrovascular', 'Covid_Multi' ,'Covid_Under'))
@@ -166,7 +170,7 @@ apply(cate, 2, table)
     ##   1   2   3   4   5   6   7   8   9  10  11  12 
     ## 360 360 360 360 360 360 360 360 360 240 240 240
 
-Fix Sex’s problem.
+-   Fix Sex’s problem.
 
 ``` r
 ah= tibble::rowid_to_column(ah, "ID")
@@ -185,7 +189,7 @@ table(ah$Sex)
     ##    F    M 
     ## 1980 1980
 
-Rename race categories
+-   Rename race categories
 
 ``` r
 for (i in 1:length(ah$ID)){
@@ -208,7 +212,7 @@ table(ah$Race)
     ##         White 
     ##           660
 
-Reorder age groups
+-   Reorder age groups
 
 ``` r
 is.factor(ah$AgeGroup)
@@ -239,9 +243,9 @@ table(ah$AgeGroup)
     ##   0-4  5-14 15-24 25-34 35-44 45-54 55-64 65-74 75-84  >=85 
     ##   396   396   396   396   396   396   396   396   396   396
 
-> Noted that sex, age, and race categories all have same sample size, so
-> the death counts could also be considered as the proportions, eligible
-> to be compared directly.
+Noted that sex, age, and race categories all have same sample size, so
+luckily the death counts could also be considered as the proportions,
+eligible to be compared directly.
 
 -   Check Numerical Variables
 
@@ -278,14 +282,16 @@ summary(ah[,11:25])
     ##  3rd Qu.:  56.0   3rd Qu.:   37.0   3rd Qu.:   33.0  
     ##  Max.   :3483.0   Max.   :15441.0   Max.   :13510.0
 
-> Since the death counts were wide-ranged integers, it’s hard to
-> summarize the leading causes’ trends with the raw data. Thus, averages
-> of death counts should be calculated for further analysis.
+Since the death counts were wide-ranged integers, it’s hard to summarize
+the leading causes’ trends with the raw data. Thus, averages of death
+counts should be calculated for further analysis.
 
 ## 1. Overall Mortality Trends by Year
 
 Table 1 presented the average death counts among different causes by
-year.
+year. Except for two COVID-19 causes, all other factors remained similar
+from 2019 to 2021. COVID-19-attributed mortality began by 2020 and
+increased slightly in 2021.
 
 ``` r
 tab1= as.tibble(group_by(ah, Year) %>% 
@@ -514,8 +520,8 @@ Covid_Under
 </tbody>
 </table>
 
-Generate a new dataset of average death counts with cause category by
-year
+-   Generate a new dataset of average death counts with cause category
+    by year
 
 ``` r
 c1= tab1 %>% pivot_longer(cols = c(AllCause, NaturalCause, Septicemia, Tumor, Diabetes, Alzheimer, FluPneumonia, Lower_R, Other_R, Nephrosis, Abnormal, Heart, Cerebrovascular, Covid_Multi, Covid_Under),
@@ -534,28 +540,17 @@ f1= c1 %>%
   ylab("Average Death Counts") + 
   theme_linedraw()
 
-grid.arrange(f1, bottom="Figure 1. Trends in death counts by leading causes, from 2019 to 2021.")
+grid.arrange(f1, bottom="Figure 1. Trends in average death counts by leading causes, from 2019 to 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
-
--   Zoom in to present those causes with relatively small counts
-
-``` r
-z1= f1 +ylim(0, 500)
-
-z1
-```
-
-    ## Warning: Removed 6 row(s) containing missing values (geom_path).
-
-    ## Warning: Removed 6 rows containing missing values (geom_point).
-
-![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- --> From Figure
+1, the top 3 causes of death were: natural cause, heart disease, and
+malignant neoplasms. As stated before, they all have remained relatively
+stable, except the drastic increase of COVID-caused death counts.
 
 ## 2. Detailed Mortality Trends by Total Month
 
-Generate new variable for total months counts
+-   Generate new variable for total months counts
 
 ``` r
 ah[, Month_total := fifelse(Y== 2019, M,
@@ -571,15 +566,15 @@ table(ah$Month_total)
     ##  21  22  23  24  25  26  27  28  29  30  31  32  33 
     ## 120 120 120 120 120 120 120 120 120 120 120 120 120
 
-Calculate average death counts among different causes by total month
+-   Calculate average death counts among different causes by total month
 
 ``` r
 tab2= as.tibble(group_by(ah, Month_total) %>% 
                        summarize( AllCause= mean(AllCause), NaturalCause= mean(NaturalCause), Septicemia= mean(Septicemia), Tumor= mean(Tumor), Diabetes= mean(Diabetes), Alzheimer= mean(Alzheimer),FluPneumonia= mean(FluPneumonia), Lower_R= mean(Lower_R), Other_R= mean(Other_R) ,Nephrosis= mean(Nephrosis), Abnormal= mean(Abnormal), Heart= mean(Heart), Cerebrovascular= mean(Cerebrovascular), Covid_Multi= mean(Covid_Multi) , Covid_Under= mean(Covid_Under)))
 ```
 
-Generate a new dataset of average death counts with cause category by
-total year
+-   Generate a new dataset of average death counts with cause category
+    by total month
 
 ``` r
 c2= tab2 %>% pivot_longer(cols = c(AllCause, NaturalCause, Septicemia, Tumor, Diabetes, Alzheimer, FluPneumonia, Lower_R, Other_R, Nephrosis, Abnormal, Heart, Cerebrovascular, Covid_Multi, Covid_Under),
@@ -599,24 +594,18 @@ f2= c2 %>%
   scale_x_continuous(name= "Total Month", breaks = seq(1, 33, by = 1)) +
   theme_linedraw()
 
-grid.arrange(f2, bottom="Figure 2. Trends in death counts by leading causes for totally 33 months (01/2019-09/2021).")
+grid.arrange(f2, bottom="Figure 2. Trends in average death counts by leading causes for totally 33 months (01/2019-09/2021).")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
-
--   Zoom in to present those causes with relatively small counts
-
-``` r
-z2=f2 +ylim(0, 900)
-
-z2
-```
-
-    ## Warning: Removed 66 row(s) containing missing values (geom_path).
-
-    ## Warning: Removed 66 rows containing missing values (geom_point).
-
-![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- --> To present
+more detailed information of monthly counts of deaths, a new variable of
+total month was created. Figure 2 showed the detailed tendency of all 15
+kinds of leading causes during the 33 month. The trend of natural cause
+line were similar to the all causes line and the difference between
+their death counts at all months were pretty small, indicating that
+natural cause was the most major cause of death. Still, Multiple and
+underlying COVID-19 causes showed a different pattern than all other
+causes.
 
 ## 3. COVID-Caused Mortality Trends
 
@@ -643,12 +632,19 @@ f3_2= subset(c2, Cause %in% "Covid_Multi" | Cause %in% "Covid_Under") %>%
   theme_linedraw()
 
 f3= ggarrange(f3_1, f3_2, nrow=2, common.legend = TRUE, legend= "right")
-grid.arrange(f3, bottom="Figure 3. Trends in death counts by COVID-19, from Jan 2019 to Sep 2021.")
+grid.arrange(f3, bottom="Figure 3. Trends in average death counts by COVID-19, from Jan 2019 to Sep 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- --> Narrowed
+down to COVID-19 causes, Figure 3 clearly showed that before month 14
+(Feb 2020), there was no COVID-19-attributed mortality in the US. Then
+for both causes, death counts started to increase from Feb 2020, the
+highest peak was at month 25 (Jan 2021).
 
 ## 4. Visualiztion of COVID-caused Death Counts by Sex, Age, and Race
+
+Since there was no COVID-caused death in 2019, following interpretation
+would be focused on data of 2020 and 2021.
 
 ### By sex
 
@@ -659,139 +655,6 @@ s= as.tibble(group_by(ah, Year, Sex) %>%
 
     ## `summarise()` has grouped output by 'Year'. You can override using the `.groups`
     ## argument.
-
-``` r
-knitr::kable(s, caption= "Table 2. Summary of COVID-caused Average Death Counts by Sex")
-```
-
-<table>
-<caption>
-Table 2. Summary of COVID-caused Average Death Counts by Sex
-</caption>
-<thead>
-<tr>
-<th style="text-align:left;">
-Year
-</th>
-<th style="text-align:left;">
-Sex
-</th>
-<th style="text-align:right;">
-AllCause
-</th>
-<th style="text-align:right;">
-Covid_Multi
-</th>
-<th style="text-align:right;">
-Covid_Under
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-2019
-</td>
-<td style="text-align:left;">
-F
-</td>
-<td style="text-align:right;">
-1918.015
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2019
-</td>
-<td style="text-align:left;">
-M
-</td>
-<td style="text-align:right;">
-2046.833
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020
-</td>
-<td style="text-align:left;">
-F
-</td>
-<td style="text-align:right;">
-2243.901
-</td>
-<td style="text-align:right;">
-244.4514
-</td>
-<td style="text-align:right;">
-220.1292
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020
-</td>
-<td style="text-align:left;">
-M
-</td>
-<td style="text-align:right;">
-2464.411
-</td>
-<td style="text-align:right;">
-290.6278
-</td>
-<td style="text-align:right;">
-268.0639
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2021
-</td>
-<td style="text-align:left;">
-F
-</td>
-<td style="text-align:right;">
-2137.974
-</td>
-<td style="text-align:right;">
-264.1630
-</td>
-<td style="text-align:right;">
-234.0370
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2021
-</td>
-<td style="text-align:left;">
-M
-</td>
-<td style="text-align:right;">
-2416.744
-</td>
-<td style="text-align:right;">
-336.4019
-</td>
-<td style="text-align:right;">
-306.5722
-</td>
-</tr>
-</tbody>
-</table>
 
 ``` r
 s %>%
@@ -959,10 +822,14 @@ f4_2= subset(c_s, Cause %in% "Covid_Under") %>%
   coord_flip() 
 
 f4= ggarrange(f4_1, f4_2, nrow=2, common.legend = TRUE, legend= "right")
-grid.arrange(f4, bottom="Figure 4. COVID-caused death counts by sex, from 2019 to 2021.")
+grid.arrange(f4, bottom="Figure 4. COVID-caused average death counts by sex, from 2019 to 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- --> Based on
+Table 2 and Figure 4, females have smaller COVID-caused average death
+counts than males in 2020 and 2021. The all_cause factor had the same
+results, indicating the higher risk of dying from COVID-19 of men than
+women.
 
 ### By age
 
@@ -1546,10 +1413,14 @@ f5_2= subset(c_a, Cause %in% "Covid_Under") %>%
   theme_linedraw()
 
 f5= ggarrange(f5_1, f5_2, nrow=2, common.legend = TRUE, legend= "right")
-grid.arrange(f5, bottom="Figure 5. COVID-caused death counts by age, from 2019 to 2021.")
+grid.arrange(f5, bottom="Figure 5. COVID-caused average death counts by age, from 2019 to 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- --> Based on
+Table 3 and Figure 5, the overall pattern was: COVID-caused average
+death counts increased with age. In 2021, the equals to or older than 85
+years old group got smaller counts than 75-84 years old group. This
+required future analysis.
 
 ### By race
 
@@ -1560,342 +1431,6 @@ r= as.tibble(group_by(ah, Year, Race) %>%
 
     ## `summarise()` has grouped output by 'Year'. You can override using the `.groups`
     ## argument.
-
-``` r
-knitr::kable(r, caption= "")
-```
-
-<table>
-<caption>
-</caption>
-<thead>
-<tr>
-<th style="text-align:left;">
-Year
-</th>
-<th style="text-align:left;">
-Race
-</th>
-<th style="text-align:right;">
-AllCause
-</th>
-<th style="text-align:right;">
-Covid_Multi
-</th>
-<th style="text-align:right;">
-Covid_Under
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-2019
-</td>
-<td style="text-align:left;">
-Asian
-</td>
-<td style="text-align:right;">
-293.87500
-</td>
-<td style="text-align:right;">
-0.00000
-</td>
-<td style="text-align:right;">
-0.00000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2019
-</td>
-<td style="text-align:left;">
-Black
-</td>
-<td style="text-align:right;">
-1444.40833
-</td>
-<td style="text-align:right;">
-0.00000
-</td>
-<td style="text-align:right;">
-0.00000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2019
-</td>
-<td style="text-align:left;">
-Hispanic
-</td>
-<td style="text-align:right;">
-884.94583
-</td>
-<td style="text-align:right;">
-0.00000
-</td>
-<td style="text-align:right;">
-0.00000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2019
-</td>
-<td style="text-align:left;">
-Indian/Alaska
-</td>
-<td style="text-align:right;">
-75.23750
-</td>
-<td style="text-align:right;">
-0.00000
-</td>
-<td style="text-align:right;">
-0.00000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2019
-</td>
-<td style="text-align:left;">
-Other
-</td>
-<td style="text-align:right;">
-96.94583
-</td>
-<td style="text-align:right;">
-0.00000
-</td>
-<td style="text-align:right;">
-0.00000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2019
-</td>
-<td style="text-align:left;">
-White
-</td>
-<td style="text-align:right;">
-9099.13333
-</td>
-<td style="text-align:right;">
-0.00000
-</td>
-<td style="text-align:right;">
-0.00000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020
-</td>
-<td style="text-align:left;">
-Asian
-</td>
-<td style="text-align:right;">
-381.62917
-</td>
-<td style="text-align:right;">
-56.54583
-</td>
-<td style="text-align:right;">
-53.07500
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020
-</td>
-<td style="text-align:left;">
-Black
-</td>
-<td style="text-align:right;">
-1875.12083
-</td>
-<td style="text-align:right;">
-256.13750
-</td>
-<td style="text-align:right;">
-235.21250
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020
-</td>
-<td style="text-align:left;">
-Hispanic
-</td>
-<td style="text-align:right;">
-1281.43750
-</td>
-<td style="text-align:right;">
-289.31250
-</td>
-<td style="text-align:right;">
-273.25000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020
-</td>
-<td style="text-align:left;">
-Indian/Alaska
-</td>
-<td style="text-align:right;">
-103.10833
-</td>
-<td style="text-align:right;">
-19.23333
-</td>
-<td style="text-align:right;">
-17.77917
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020
-</td>
-<td style="text-align:left;">
-Other
-</td>
-<td style="text-align:right;">
-122.26250
-</td>
-<td style="text-align:right;">
-14.26250
-</td>
-<td style="text-align:right;">
-13.17500
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020
-</td>
-<td style="text-align:left;">
-White
-</td>
-<td style="text-align:right;">
-10361.37917
-</td>
-<td style="text-align:right;">
-969.74583
-</td>
-<td style="text-align:right;">
-872.08750
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2021
-</td>
-<td style="text-align:left;">
-Asian
-</td>
-<td style="text-align:right;">
-378.57778
-</td>
-<td style="text-align:right;">
-62.75000
-</td>
-<td style="text-align:right;">
-58.54444
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2021
-</td>
-<td style="text-align:left;">
-Black
-</td>
-<td style="text-align:right;">
-1761.60000
-</td>
-<td style="text-align:right;">
-253.45000
-</td>
-<td style="text-align:right;">
-229.17222
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2021
-</td>
-<td style="text-align:left;">
-Hispanic
-</td>
-<td style="text-align:right;">
-1290.42222
-</td>
-<td style="text-align:right;">
-314.92778
-</td>
-<td style="text-align:right;">
-296.87778
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2021
-</td>
-<td style="text-align:left;">
-Indian/Alaska
-</td>
-<td style="text-align:right;">
-100.41667
-</td>
-<td style="text-align:right;">
-17.62222
-</td>
-<td style="text-align:right;">
-16.15000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2021
-</td>
-<td style="text-align:left;">
-Other
-</td>
-<td style="text-align:right;">
-120.27222
-</td>
-<td style="text-align:right;">
-15.22778
-</td>
-<td style="text-align:right;">
-13.80556
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2021
-</td>
-<td style="text-align:left;">
-White
-</td>
-<td style="text-align:right;">
-10012.86667
-</td>
-<td style="text-align:right;">
-1137.71667
-</td>
-<td style="text-align:right;">
-1007.27778
-</td>
-</tr>
-</tbody>
-</table>
 
 ``` r
 r %>%
@@ -2265,11 +1800,26 @@ f6_2= subset(c_r, Cause %in% "Covid_Under") %>%
   theme_linedraw()
 
 f6= ggarrange(f6_1, f6_2, nrow=2, common.legend = TRUE, legend= "right")
-grid.arrange(f6, bottom="Figure 6. COVID-caused death counts by race, from 2019 to 2021.")
+grid.arrange(f6, bottom="Figure 6. COVID-caused average death counts by race, from 2019 to 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+
+From Table 4 and Figure 6, we can find the same pattern in 2020 and
+2021. White people got the highest average death counts, while Indian/
+Alaska Native had smallest mortality. From small to large average death
+counts, the order is: Other, Indian/Alaska Native, Asian, Black,
+Hispanic, White.
 
 # Conclusion
 
-limitations: no proportion, only us,
+This research of mortality comparison among different causes first
+showed that except for two COVID-19 causes, all other leading causes of
+death had stable trends from 2019 to 2021. The top 3 leading causes are
+natural cause, heart disease, and tumor. The COVID-caused mortality
+started at Feb 2020 and reached it peak at Jan 2021.For different sex,
+age, and race groups, there were obvious difference of average
+COVID-caused death counts. Females tended to had smaller average death
+counts than males, Elder people tended to had higher average mortality
+than young people. White people got the highest average death counts,
+while Indian/ Alaska Native and Other had smallest mortality.
