@@ -1,5 +1,5 @@
 ---
-title: "Leading Causes of Death in US"
+title: "Analysis of Current Death Counts and Leading Causes in US, focusing on Covid-19"
 author: "Yumeng Gao"
 date: "`r Sys.Date()`"
 output: github_document
@@ -14,27 +14,14 @@ always_allow_html: true
 
 # Conclusion
 
+-   Mortality comparison among different causes by year, sex, age, and race.
+-   Cause proportions?
+-   The influence of Covid-19 causes (multiple & underlying)
 
+> since allcause not equal to the sum of these individual causes, proportions were not calculated.
 
-* Mortality comparison among 3 years (overall, by sex, by age, and by race)
-* Mortality comparison among different causes (adding proportions?)
-* The influence of Covid-19 causes (multiple & underlying)
+# DELETE
 
-
-
-> Exploratory Data Analysis
-
-1. Formulate a question
-2. Read in the data
-3. Check the dimensions and headers and footers of the data
-5. Take a closer look at some/all of the variables
-6. Validate with an external source
-7. Conduct some summary statistics to answer the initial question - Make exploratory graphs
-
-
-
-
-### Prepare the library--> DELETE?
 ```{r}
 library(data.table)
 library(dplyr)
@@ -45,18 +32,25 @@ library(lubridate)
 library(leaflet)
 library(webshot)
 library(cowplot)
+library(ggpubr)
+library(gridExtra)
+library(RColorBrewer)
 ```
 
+> Exploratory Data Analysis
 
+1.  Formulate a question
+2.  Read in the data
+3.  Check the dimensions and headers and footers of the data
+4.  Take a closer look at some/all of the variables
+5.  Validate with an external source
+6.  Conduct some summary statistics to answer the initial question - Make exploratory graphs
 
 ### Download dataset from CDC's website and read it in.
 
-
-AH Monthly Provisional Counts of Deaths for Select Causes of Death by Sex, Age, and Race and Hispanic Origin
-(https://data.cdc.gov/NCHS/AH-Monthly-Provisional-Counts-of-Deaths-for-Select/65mz-jvh5)
+AH Monthly Provisional Counts of Deaths for Select Causes of Death by Sex, Age, and Race and Hispanic Origin (<https://data.cdc.gov/NCHS/AH-Monthly-Provisional-Counts-of-Deaths-for-Select/65mz-jvh5>)
 
 Provisional counts of deaths by the month the deaths occurred, by age group, sex, and race/ethnicity, for select underlying causes of death for 2020-2021. Final data are provided for 2019. The dataset also includes monthly provisional counts of death for COVID-19, as an underlying or multiple cause of death.
-
 
 ```{r}
 if (!file.exists("deaths.csv")) {
@@ -66,7 +60,11 @@ if (!file.exists("deaths.csv")) {
 ah= data.table::fread("deaths.csv")
 ```
 
+```{r}
+org= data.table::fread("deaths.csv")
+```
 
+## 
 
 ```{r}
 dim(ah)
@@ -74,31 +72,27 @@ head(ah)
 tail(ah)
 ```
 
-4. Check the variable types in the data
 ```{r}
 str(ah)
 ```
+
+## 
 
 Change the names of the key variables so that they are easier to refer to in the code.
-```{r}
-setnames(ah, old = c('Date Of Death Year', 'Date Of Death Month', 'Race/Ethnicity' ,'Septicemia (A40-A41)', 'Malignant neoplasms (C00-C97)', 'Diabetes mellitus (E10-E14)', 'Alzheimer disease (G30)', 'Influenza and pneumonia (J09-J18)', 'Chronic lower respiratory diseases (J40-J47)', 'Other diseases of respiratory system (J00-J06,J30-J39,J67,J70-J98)', 'Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)','Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified (R00-R99)', 'Diseases of heart (I00-I09,I11,I13,I20-I51)' ,'Cerebrovascular diseases (I60-I69)' ,'COVID-19 (U071, Multiple Cause of Death)' ,'COVID-19 (U071, Underlying Cause of Death)'), new = c('Year', 'Month', 'Race', 'Septicemia', 'Tumor', 'Diabetes', 'Alzheimer', 'Flu&Pneumonia', 'Lower_R','Other_R' ,'Nephrosis', 'Abnormal', 'Heart', 'Cerebrovascular', 'Covid_Multi' ,'Covid_Under'))
-```
-
 
 ```{r}
-str(ah)
+setnames(ah, old = c('Date Of Death Year', 'Date Of Death Month', 'Race/Ethnicity' ,'Septicemia (A40-A41)', 'Malignant neoplasms (C00-C97)', 'Diabetes mellitus (E10-E14)', 'Alzheimer disease (G30)', 'Influenza and pneumonia (J09-J18)', 'Chronic lower respiratory diseases (J40-J47)', 'Other diseases of respiratory system (J00-J06,J30-J39,J67,J70-J98)', 'Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)','Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified (R00-R99)', 'Diseases of heart (I00-I09,I11,I13,I20-I51)' ,'Cerebrovascular diseases (I60-I69)' ,'COVID-19 (U071, Multiple Cause of Death)' ,'COVID-19 (U071, Underlying Cause of Death)'), new = c('Y', 'M', 'Race', 'Septicemia', 'Tumor', 'Diabetes', 'Alzheimer', 'FluPneumonia', 'Lower_R','Other_R' ,'Nephrosis', 'Abnormal', 'Heart', 'Cerebrovascular', 'Covid_Multi' ,'Covid_Under'))
 ```
-
 
 Categorical Variables
+
 ```{r}
-ah$Y= as.character(ah$Year)
-ah$M= as.character(ah$Month)
+ah$Year= format(ah$Y,format="%y")
+ah$Month= format(ah$M,format="%m")
 is.char= sapply(ah, is.character)
 cate= ah[, ..is.char]
 apply(cate, 2, table)
 ```
-
 
 Fix Sex's problem.
 ```{r}
@@ -115,166 +109,303 @@ table(ah$Sex)
 ```
 
 
-Numerical Variables
+Rename race categories
+```{r}
+for (i in 1:length(ah$ID)){
+  if (ah$Race[i]== 'Non-Hispanic American Indian or Alaska Native'){
+    ah$Race[i]= 'Indian/Alaska'
+  } else if (ah$Race[i]== 'Non-Hispanic Asian'){
+    ah$Race[i]= 'Asian'
+    } else if (ah$Race[i]== 'Non-Hispanic Black'){
+    ah$Race[i]= 'Black'
+    } else if (ah$Race[i]== 'Non-Hispanic White'){
+    ah$Race[i]= 'White'
+}}
+
+table(ah$Race)
+```
+
+
+Reorder age groups
+```{r}
+is.factor(ah$AgeGroup)
+
+ah$AgeGroup= as.factor(ah$AgeGroup)
+
+levels(ah$AgeGroup)
+```
+
+```{r}
+levels(ah$AgeGroup)= c('0-4', '15-24', '25-34', '35-44', '45-54', '5-14', '55-64', '65-74', '75-84', '>=85')
+
+ah$AgeGroup= factor(ah$AgeGroup, levels=c('0-4', '5-14', '15-24', '25-34', '35-44', '45-54', '55-64', '65-74', '75-84', '>=85'))
+
+table(ah$AgeGroup)
+```
+
+* Noted that sex, age, and race categories all have same sample size
+
+Numerical Variables--> meaningless?
 ```{r}
 summary(ah[,11:25])
 ```
 
+## Year--> overall trends
 
-
+Calculate average death counts among different causes by year
 
 ```{r}
-avg_m= as.data.table(group_by(ah, Year, Month) %>% summarize( AllCause= mean(AllCause), NaturalCause= mean(NaturalCause), Septicemia= mean(Septicemia),Tumor= mean(Tumor)))
+tab1= as.tibble(group_by(ah, Year) %>% 
+                       summarize( AllCause= mean(AllCause), NaturalCause= mean(NaturalCause), Septicemia= mean(Septicemia), Tumor= mean(Tumor), Diabetes= mean(Diabetes), Alzheimer= mean(Alzheimer),FluPneumonia= mean(FluPneumonia), Lower_R= mean(Lower_R), Other_R= mean(Other_R) ,Nephrosis= mean(Nephrosis), Abnormal= mean(Abnormal), Heart= mean(Heart), Cerebrovascular= mean(Cerebrovascular), Covid_Multi= mean(Covid_Multi) , Covid_Under= mean(Covid_Under)))
+
+knitr::kable(tab1, caption= "Table 1. Summary of Average Death Counts for Leading Causes by Year")
+```
+
+Generate a new dataset of average death counts with cause category by year
+
+```{r}
+c1= tab1 %>% pivot_longer(cols = c(AllCause, NaturalCause, Septicemia, Tumor, Diabetes, Alzheimer, FluPneumonia, Lower_R, Other_R, Nephrosis, Abnormal, Heart, Cerebrovascular, Covid_Multi, Covid_Under),
+                           names_to = "Cause")
+```
+
+```{r}
+f1= c1 %>%
+  mutate(Cause= fct_reorder(Cause, desc(value))) %>%
+  ggplot(mapping= aes(x = Year, 
+                     y = value, 
+                     col = Cause, 
+                     group = Cause)) +
+  geom_line() + 
+  geom_point() +
+  ylab("Average Death Counts") + 
+  theme_linedraw()
+
+grid.arrange(f1, bottom="Figure 1. Trends in death counts by leading causes, from 2019 to 2021.")
+```
+
+Zoom in to present those causes with relatively small counts
+
+```{r}
+z1= f1 +ylim(0, 500)
+
+z1
+```
+
+## Month_total--> more details
+
+Generate new variable for total months counts
+
+```{r}
+ah[, Month_total := fifelse(Y== 2019, M,
+                   fifelse(Y== 2020, M+12, M+24))
+    ]
+
+table(ah$Month_total)
+```
+
+```{r}
+save= ah
+```
+
+Calculate average death counts among different causes by total month
+
+```{r}
+tab2= as.tibble(group_by(ah, Month_total) %>% 
+                       summarize( AllCause= mean(AllCause), NaturalCause= mean(NaturalCause), Septicemia= mean(Septicemia), Tumor= mean(Tumor), Diabetes= mean(Diabetes), Alzheimer= mean(Alzheimer),FluPneumonia= mean(FluPneumonia), Lower_R= mean(Lower_R), Other_R= mean(Other_R) ,Nephrosis= mean(Nephrosis), Abnormal= mean(Abnormal), Heart= mean(Heart), Cerebrovascular= mean(Cerebrovascular), Covid_Multi= mean(Covid_Multi) , Covid_Under= mean(Covid_Under)))
+```
+
+Generate a new dataset of average death counts with cause category by total year
+
+```{r}
+c2= tab2 %>% pivot_longer(cols = c(AllCause, NaturalCause, Septicemia, Tumor, Diabetes, Alzheimer, FluPneumonia, Lower_R, Other_R, Nephrosis, Abnormal, Heart, Cerebrovascular, Covid_Multi, Covid_Under),
+                           names_to = "Cause")
+```
+
+```{r}
+f2= c2 %>%
+  mutate(Cause= fct_reorder(Cause, desc(value))) %>%
+  ggplot(mapping= aes(x = Month_total, 
+                     y = value, 
+                     col = Cause, 
+                     group = Cause)) +
+  geom_line() + 
+  geom_point() +
+  ylab("Average Death Counts") +
+  scale_x_continuous(name= "Total Month", breaks = seq(1, 33, by = 1)) +
+  theme_linedraw()
+
+grid.arrange(f2, bottom="Figure 2. Trends in death counts by leading causes for totally 33 months (01/2019-09/2021).")
+```
+
+Zoom in to present those causes with relatively small counts
+
+```{r}
+z2=f2 +ylim(0, 900)
+
+z2
+```
+
+## delete
+
+```{r}
+ggarrange(z1, z2, nrow=2, common.legend = TRUE, legend= "right")
+```
+
+For Covid Causes
+
+```{r}
+f3_1= subset(c1, Cause %in% "Covid_Multi" | Cause %in% "Covid_Under") %>%
+  ggplot(mapping= aes(x = Year, 
+                     y = value, 
+                     col = Cause, 
+                     group = Cause)) +
+  geom_line() + 
+  geom_point() +
+  ylab("Average Death Counts") + 
+  theme_linedraw()
+
+f3_2= subset(c2, Cause %in% "Covid_Multi" | Cause %in% "Covid_Under") %>%
+  ggplot(mapping= aes(x = Month_total, 
+                     y = value, 
+                     col = Cause, 
+                     group = Cause)) +
+  geom_line() + 
+  geom_point() +
+  ylab("Average Death Counts") +
+  scale_x_continuous(name= "Total Month", breaks = seq(1, 33, by = 1)) +
+  theme_linedraw()
+
+f3= ggarrange(f3_1, f3_2, nrow=2, common.legend = TRUE, legend= "right")
+grid.arrange(f3, bottom="Figure 3. Trends in death counts by Covid-19, from Jan 2019 to Sep 2021.")
+```
+
+## Now visualize Covid-caused death counts by sex, age, and race.
+
+### By sex
+```{r}
+s= as.tibble(group_by(ah, Year, Sex) %>% 
+                       summarize( AllCause= mean(AllCause), Covid_Multi= mean(Covid_Multi) , Covid_Under= mean(Covid_Under)))
+
+knitr::kable(s, caption= "Table 2. Summary of Covid-caused Average Death Counts by Sex")
+```
+
+```{r}
+c_s= s %>% pivot_longer(cols = c(AllCause, Covid_Multi, Covid_Under),
+                           names_to = "Cause")
+```
+
+```{r}
+f4_1= subset(c_s, Cause %in% "Covid_Multi") %>%
+  ggplot(mapping= aes(x = Year, 
+                     y = value, 
+                     col = Sex, 
+                     fill = Sex)) +
+  geom_bar(stat='identity', position = "dodge", width= 0.5) +
+  ylab("Average Death Counts") +
+  scale_color_grey() +
+  scale_fill_grey() +
+  theme_linedraw() +
+  coord_flip()
+
+f4_2= subset(c_s, Cause %in% "Covid_Under") %>%
+  ggplot(mapping= aes(x = Year, 
+                     y = value, 
+                     col = Sex, 
+                     fill = Sex)) +
+  geom_bar(stat='identity', position = "dodge", width= 0.5) +
+  ylab("Average Death Counts") +
+  scale_color_grey() +
+  scale_fill_grey() +
+  theme_linedraw() +
+  coord_flip() 
+
+f4= ggarrange(f4_1, f4_2, nrow=2, common.legend = TRUE, legend= "right")
+grid.arrange(f4, bottom="Figure 4. Covid-caused death counts by sex, from 2019 to 2021.")
+
+```
+
+### By age
+```{r}
+a= as.tibble(group_by(ah, Year, AgeGroup) %>% 
+                       summarize( AllCause= mean(AllCause), Covid_Multi= mean(Covid_Multi) , Covid_Under= mean(Covid_Under)))
+
+knitr::kable(a, caption= "Table 2. Summary of Covid-caused Average Death Counts by Age")
+```
+
+```{r}
+c_a= a %>% pivot_longer(cols = c(AllCause, Covid_Multi, Covid_Under),
+                           names_to = "Cause")
+```
+
+```{r}
+f5_1= subset(c_a, Cause %in% "Covid_Multi") %>%
+  ggplot(mapping= aes(x = Year, 
+                     y = value, 
+                     col = AgeGroup, 
+                     fill = AgeGroup)) +
+  geom_bar(stat='identity', position = "dodge", width= 0.7) +
+  ylab("Average Death Counts") +
+  scale_color_brewer(palette="PuOr") +
+  scale_fill_brewer(palette="PuOr") +
+  theme_linedraw()
+
+f5_2= subset(c_a, Cause %in% "Covid_Under") %>%
+  ggplot(mapping= aes(x = Year, 
+                     y = value, 
+                     col = AgeGroup, 
+                     fill = AgeGroup)) +
+  geom_bar(stat='identity', position = "dodge", width= 0.7) +
+  ylab("Average Death Counts") +
+  scale_color_brewer(palette="PuOr") +
+  scale_fill_brewer(palette="PuOr") +
+  theme_linedraw()
+
+f5= ggarrange(f5_1, f5_2, nrow=2, common.legend = TRUE, legend= "right")
+grid.arrange(f5, bottom="Figure 5. Covid-caused death counts by age, from 2019 to 2021.")
+
 ```
 
 
+### By race
 ```{r}
-ggplot(data = avg_m)+
- geom_line(mapping=aes(x= Month, y= NaturalCause, group= Year, color= Year))
-```
-```{r}
+r= as.tibble(group_by(ah, Year, Race) %>% 
+                       summarize( AllCause= mean(AllCause), Covid_Multi= mean(Covid_Multi) , Covid_Under= mean(Covid_Under)))
 
-```
-
-
-
-
-
-
-
-```{r}
-
+knitr::kable(r, caption= "Table 4. Summary of Covid-caused Average Death Counts by Race")
 ```
 
-
-
 ```{r}
-
+c_r= r %>% pivot_longer(cols = c(AllCause, Covid_Multi, Covid_Under),
+                           names_to = "Cause")
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```{r}
+f6_1= subset(c_r, Cause %in% "Covid_Multi") %>%
+  ggplot(mapping= aes(x = Year, 
+                     y = value, 
+                     col = Race, 
+                     fill = Race)) +
+  geom_bar(stat='identity', position = "dodge", width= 0.5) +
+  ylab("Average Death Counts") +
+  scale_color_brewer(palette="Set2") +
+  scale_fill_brewer(palette="Set2") +
+  theme_linedraw()
+
+f6_2= subset(c_r, Cause %in% "Covid_Under") %>%
+  ggplot(mapping= aes(x = Year, 
+                     y = value, 
+                     col = Race, 
+                     fill = Race)) +
+  geom_bar(stat='identity', position = "dodge", width= 0.5) +
+  ylab("Average Death Counts") +
+  scale_color_brewer(palette="Set2") +
+  scale_fill_brewer(palette="Set2") +
+  theme_linedraw()
+
+f6= ggarrange(f6_1, f6_2, nrow=2, common.legend = TRUE, legend= "right")
+grid.arrange(f6, bottom="Figure 6. Covid-caused death counts by race, from 2019 to 2021.")
+
+```
 
 
 
