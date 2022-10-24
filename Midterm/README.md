@@ -1,183 +1,70 @@
-Analysis of Current Death Counts and Leading Causes in US, focusing on
-Covid-19
+Analysis of Current Death Counts and Leading Causes in the US, focusing
+on COVID-19
 ================
 Yumeng Gao
 2022-10-23
 
 # Introduction
 
+COVID-19 has gradually became one of the leading causes of death in the
+US since its outbreak in 2020. According to US Center for Disease
+Control and Prevention (CDC), the top 10 leading causes of death now
+are: heart disease, cancer, COVID-19, accidents (unintentional
+injuries), stroke (cerebrovascular diseases), chronic lower respiratory
+diseases, Alzheimer’s disease, diabetes, influenza and pneumonia, as
+well as nephritis, nephrotic syndrome, and nephrosis. Moreover, COVID-19
+may interact with other diseases to impair the health conditions of its
+hosts, eventually leading to death. Thus, it is pivotal to draw a
+picture of COVID-19-attributed mortality with other leading causes of
+death, to quantify the influence of this pandemic. This study focused on
+the overall death counts in the US and leading causes, then narrowed
+down to COVID-caused death counts in different age, sex, and race
+groups. The primary research question was to what extent is the impact
+of COVID-19 on mortality currently.
+
 # Methods
+
+The original dataset of this study was exported from CDC’s website: AH
+Monthly Provisional Counts of Deaths for Select Causes of Death by Sex,
+Age, and Race and Hispanic Origin
+(<https://data.cdc.gov/NCHS/AH-Monthly-Provisional-Counts-of-Deaths-for-Select/65mz-jvh5>)
+as a csv format.
+
+After reading in the dataset, the variables with long names were renamed
+for convenience. Then we checked the major elements of this dataset,
+following with a closer look at the key variables (leading causes of
+death) to check for missing values and outliers. For each categorical
+variables, the name and order of categories were checked and corrected
+if necessary.
+
+To better interpret the data, we first summarized the average death
+counts among different causes by year, then generated a scatter plot to
+visualize the tendency of death counts by leading causes form 2019 to
+2021. To get more details, the average death counts of different causes
+by total 33 months were also created, following with paired scatter
+plot. To emphasize COVID-19 multiple and underlying causes, we plotted
+the related trends of death counts by year and by total month.
+
+Then for the analysis narrowing down to COVID-19 multiple and underlying
+causes, grouping by sex, age, and race groups. A summary table along
+with bar chart were generated for each these three categorical variables
+to present the difference of COVID-caused mortality among groups.
 
 # Preliminary Results
 
-# Conclusion
+The selected causes for this study were: 1. Natural Cause, 2.
+Septicemia, 3. Malignant neoplasms, 4. Diabetes mellitus, 5. Alzheimer
+disease, 6. Influenza and pneumonia, 7. Chronic lower respiratory
+diseases, 8. Other diseases of respiratory system , 9. Nephritis,
+nephrotic syndrome and nephrosis, 10. Symptoms, signs and abnormal
+clinical and laboratory findings, not elsewhere classified, 11. Diseases
+of heart, 12. Cerebrovascular diseases, 13. COVID-19 (Multiple Cause of
+Death), 14. COVID-19 ( Underlying Cause of Death)
 
--   Mortality comparison among different causes by year, sex, age, and
-    race.
--   Cause proportions?
--   The influence of Covid-19 causes (multiple & underlying)
+All Causes was also collected, however, it was not equal to the sum of
+these individual causes, so the proportions were unable to calculate.
 
-> since allcause not equal to the sum of these individual causes,
-> proportions were not calculated.
-
-# DELETE
-
-``` r
-library(data.table)
-library(dplyr)
-```
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:data.table':
-    ## 
-    ##     between, first, last
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
-
-``` r
-library(dtplyr)
-library(tidyverse)
-```
-
-    ## ── Attaching packages
-    ## ───────────────────────────────────────
-    ## tidyverse 1.3.2 ──
-
-    ## ✔ ggplot2 3.3.6     ✔ purrr   0.3.4
-    ## ✔ tibble  3.1.8     ✔ stringr 1.4.1
-    ## ✔ tidyr   1.2.0     ✔ forcats 0.5.2
-    ## ✔ readr   2.1.2     
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## ✖ dplyr::between()   masks data.table::between()
-    ## ✖ dplyr::filter()    masks stats::filter()
-    ## ✖ dplyr::first()     masks data.table::first()
-    ## ✖ dplyr::lag()       masks stats::lag()
-    ## ✖ dplyr::last()      masks data.table::last()
-    ## ✖ purrr::transpose() masks data.table::transpose()
-
-``` r
-library(R.utils)
-```
-
-    ## Loading required package: R.oo
-    ## Loading required package: R.methodsS3
-    ## R.methodsS3 v1.8.2 (2022-06-13 22:00:14 UTC) successfully loaded. See ?R.methodsS3 for help.
-    ## R.oo v1.25.0 (2022-06-12 02:20:02 UTC) successfully loaded. See ?R.oo for help.
-    ## 
-    ## Attaching package: 'R.oo'
-    ## 
-    ## The following object is masked from 'package:R.methodsS3':
-    ## 
-    ##     throw
-    ## 
-    ## The following objects are masked from 'package:methods':
-    ## 
-    ##     getClasses, getMethods
-    ## 
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     attach, detach, load, save
-    ## 
-    ## R.utils v2.12.0 (2022-06-28 03:20:05 UTC) successfully loaded. See ?R.utils for help.
-    ## 
-    ## Attaching package: 'R.utils'
-    ## 
-    ## The following object is masked from 'package:tidyr':
-    ## 
-    ##     extract
-    ## 
-    ## The following object is masked from 'package:utils':
-    ## 
-    ##     timestamp
-    ## 
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     cat, commandArgs, getOption, isOpen, nullfile, parse, warnings
-
-``` r
-library(lubridate)
-```
-
-    ## 
-    ## Attaching package: 'lubridate'
-    ## 
-    ## The following objects are masked from 'package:data.table':
-    ## 
-    ##     hour, isoweek, mday, minute, month, quarter, second, wday, week,
-    ##     yday, year
-    ## 
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     date, intersect, setdiff, union
-
-``` r
-library(leaflet)
-library(webshot)
-library(cowplot)
-```
-
-    ## 
-    ## Attaching package: 'cowplot'
-    ## 
-    ## The following object is masked from 'package:lubridate':
-    ## 
-    ##     stamp
-
-``` r
-library(ggpubr)
-```
-
-    ## 
-    ## Attaching package: 'ggpubr'
-    ## 
-    ## The following object is masked from 'package:cowplot':
-    ## 
-    ##     get_legend
-
-``` r
-library(gridExtra)
-```
-
-    ## 
-    ## Attaching package: 'gridExtra'
-    ## 
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     combine
-
-``` r
-library(RColorBrewer)
-```
-
-> Exploratory Data Analysis
-
-1.  Formulate a question
-2.  Read in the data
-3.  Check the dimensions and headers and footers of the data
-4.  Take a closer look at some/all of the variables
-5.  Validate with an external source
-6.  Conduct some summary statistics to answer the initial question -
-    Make exploratory graphs
-
-### Download dataset from CDC’s website and read it in.
-
-AH Monthly Provisional Counts of Deaths for Select Causes of Death by
-Sex, Age, and Race and Hispanic Origin
-(<https://data.cdc.gov/NCHS/AH-Monthly-Provisional-Counts-of-Deaths-for-Select/65mz-jvh5>)
-
-Provisional counts of deaths by the month the deaths occurred, by age
-group, sex, and race/ethnicity, for select underlying causes of death
-for 2020-2021. Final data are provided for 2019. The dataset also
-includes monthly provisional counts of death for COVID-19, as an
-underlying or multiple cause of death.
+Download dataset from CDC’s website and read it in.
 
 ``` r
 if (!file.exists("deaths.csv")) {
@@ -187,229 +74,6 @@ if (!file.exists("deaths.csv")) {
 ah= data.table::fread("deaths.csv")
 ```
 
-``` r
-org= data.table::fread("deaths.csv")
-```
-
-## 
-
-``` r
-dim(ah)
-```
-
-    ## [1] 3960   24
-
-``` r
-head(ah)
-```
-
-    ##    AnalysisDate Date Of Death Year Date Of Death Month Start Date   End Date
-    ## 1:   10/13/2021               2019                   7 07/01/2019 07/31/2019
-    ## 2:   10/13/2021               2019                   9 09/01/2019 09/30/2019
-    ## 3:   10/13/2021               2020                   3 03/01/2020 03/31/2020
-    ## 4:   10/13/2021               2020                   3 03/01/2020 03/31/2020
-    ## 5:   10/13/2021               2020                   3 03/01/2020 03/31/2020
-    ## 6:   10/13/2021               2021                   4 04/01/2021 04/30/2021
-    ##    Jurisdiction of Occurrence    Sex Race/Ethnicity    AgeGroup AllCause
-    ## 1:              United States      M          Other   0-4 years       61
-    ## 2:              United States      F          Other 25-34 years       26
-    ## 3:              United States Female          Other   0-4 years       40
-    ## 4:              United States Female          Other  5-14 years        6
-    ## 5:              United States Female          Other 15-24 years       14
-    ## 6:              United States   Male          Other   0-4 years       49
-    ##    NaturalCause Septicemia (A40-A41) Malignant neoplasms (C00-C97)
-    ## 1:           52                    0                             1
-    ## 2:            8                    0                             1
-    ## 3:           35                    0                             0
-    ## 4:            4                    1                             0
-    ## 5:            2                    0                             0
-    ## 6:           42                    0                             0
-    ##    Diabetes mellitus (E10-E14) Alzheimer disease (G30)
-    ## 1:                           0                       0
-    ## 2:                           0                       0
-    ## 3:                           0                       0
-    ## 4:                           0                       0
-    ## 5:                           0                       0
-    ## 6:                           0                       0
-    ##    Influenza and pneumonia (J09-J18)
-    ## 1:                                 1
-    ## 2:                                 0
-    ## 3:                                 1
-    ## 4:                                 1
-    ## 5:                                 0
-    ## 6:                                 0
-    ##    Chronic lower respiratory diseases (J40-J47)
-    ## 1:                                            0
-    ## 2:                                            0
-    ## 3:                                            0
-    ## 4:                                            0
-    ## 5:                                            0
-    ## 6:                                            0
-    ##    Other diseases of respiratory system (J00-J06,J30-J39,J67,J70-J98)
-    ## 1:                                                                  1
-    ## 2:                                                                  0
-    ## 3:                                                                  0
-    ## 4:                                                                  0
-    ## 5:                                                                  0
-    ## 6:                                                                  0
-    ##    Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)
-    ## 1:                                                                     0
-    ## 2:                                                                     0
-    ## 3:                                                                     0
-    ## 4:                                                                     0
-    ## 5:                                                                     0
-    ## 6:                                                                     0
-    ##    Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified (R00-R99)
-    ## 1:                                                                                                 6
-    ## 2:                                                                                                 0
-    ## 3:                                                                                                 7
-    ## 4:                                                                                                 0
-    ## 5:                                                                                                 1
-    ## 6:                                                                                                 6
-    ##    Diseases of heart (I00-I09,I11,I13,I20-I51)
-    ## 1:                                           0
-    ## 2:                                           1
-    ## 3:                                           0
-    ## 4:                                           0
-    ## 5:                                           0
-    ## 6:                                           0
-    ##    Cerebrovascular diseases (I60-I69) COVID-19 (U071, Multiple Cause of Death)
-    ## 1:                                  1                                        0
-    ## 2:                                  1                                        0
-    ## 3:                                  0                                        0
-    ## 4:                                  0                                        0
-    ## 5:                                  0                                        0
-    ## 6:                                  0                                        1
-    ##    COVID-19 (U071, Underlying Cause of Death)
-    ## 1:                                          0
-    ## 2:                                          0
-    ## 3:                                          0
-    ## 4:                                          0
-    ## 5:                                          0
-    ## 6:                                          1
-
-``` r
-tail(ah)
-```
-
-    ##    AnalysisDate Date Of Death Year Date Of Death Month Start Date   End Date
-    ## 1:   10/13/2021               2021                   9 09/01/2021 09/30/2021
-    ## 2:   10/13/2021               2021                   9 09/01/2021 09/30/2021
-    ## 3:   10/13/2021               2021                   9 09/01/2021 09/30/2021
-    ## 4:   10/13/2021               2021                   9 09/01/2021 09/30/2021
-    ## 5:   10/13/2021               2021                   9 09/01/2021 09/30/2021
-    ## 6:   10/13/2021               2021                   9 09/01/2021 09/30/2021
-    ##    Jurisdiction of Occurrence  Sex Race/Ethnicity          AgeGroup AllCause
-    ## 1:              United States Male          Other       35-44 years      107
-    ## 2:              United States Male          Other       45-54 years      179
-    ## 3:              United States Male          Other       55-64 years      237
-    ## 4:              United States Male          Other       65-74 years      263
-    ## 5:              United States Male          Other       75-84 years      203
-    ## 6:              United States Male          Other 85 years and over      116
-    ##    NaturalCause Septicemia (A40-A41) Malignant neoplasms (C00-C97)
-    ## 1:           95                    0                             6
-    ## 2:          168                    1                            15
-    ## 3:          225                    2                            34
-    ## 4:          258                    2                            51
-    ## 5:          200                    1                            35
-    ## 6:          116                    3                            13
-    ##    Diabetes mellitus (E10-E14) Alzheimer disease (G30)
-    ## 1:                           2                       0
-    ## 2:                           2                       1
-    ## 3:                           7                       0
-    ## 4:                          11                       3
-    ## 5:                           9                       5
-    ## 6:                           2                       7
-    ##    Influenza and pneumonia (J09-J18)
-    ## 1:                                 0
-    ## 2:                                 1
-    ## 3:                                 3
-    ## 4:                                 4
-    ## 5:                                 2
-    ## 6:                                 1
-    ##    Chronic lower respiratory diseases (J40-J47)
-    ## 1:                                            0
-    ## 2:                                            0
-    ## 3:                                            8
-    ## 4:                                            8
-    ## 5:                                            6
-    ## 6:                                            9
-    ##    Other diseases of respiratory system (J00-J06,J30-J39,J67,J70-J98)
-    ## 1:                                                                  0
-    ## 2:                                                                  0
-    ## 3:                                                                  3
-    ## 4:                                                                  3
-    ## 5:                                                                  4
-    ## 6:                                                                  2
-    ##    Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)
-    ## 1:                                                                     2
-    ## 2:                                                                     2
-    ## 3:                                                                     2
-    ## 4:                                                                     4
-    ## 5:                                                                     4
-    ## 6:                                                                     1
-    ##    Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified (R00-R99)
-    ## 1:                                                                                                33
-    ## 2:                                                                                                34
-    ## 3:                                                                                                36
-    ## 4:                                                                                                25
-    ## 5:                                                                                                17
-    ## 6:                                                                                                 1
-    ##    Diseases of heart (I00-I09,I11,I13,I20-I51)
-    ## 1:                                           9
-    ## 2:                                          18
-    ## 3:                                          40
-    ## 4:                                          60
-    ## 5:                                          37
-    ## 6:                                          23
-    ##    Cerebrovascular diseases (I60-I69) COVID-19 (U071, Multiple Cause of Death)
-    ## 1:                                  2                                       27
-    ## 2:                                  2                                       70
-    ## 3:                                  8                                       55
-    ## 4:                                  7                                       55
-    ## 5:                                  8                                       36
-    ## 6:                                  7                                       18
-    ##    COVID-19 (U071, Underlying Cause of Death)
-    ## 1:                                         24
-    ## 2:                                         68
-    ## 3:                                         55
-    ## 4:                                         49
-    ## 5:                                         34
-    ## 6:                                         18
-
-``` r
-str(ah)
-```
-
-    ## Classes 'data.table' and 'data.frame':   3960 obs. of  24 variables:
-    ##  $ AnalysisDate                                                                                     : chr  "10/13/2021" "10/13/2021" "10/13/2021" "10/13/2021" ...
-    ##  $ Date Of Death Year                                                                               : int  2019 2019 2020 2020 2020 2021 2019 2019 2019 2019 ...
-    ##  $ Date Of Death Month                                                                              : int  7 9 3 3 3 4 1 1 1 1 ...
-    ##  $ Start Date                                                                                       : chr  "07/01/2019" "09/01/2019" "03/01/2020" "03/01/2020" ...
-    ##  $ End Date                                                                                         : chr  "07/31/2019" "09/30/2019" "03/31/2020" "03/31/2020" ...
-    ##  $ Jurisdiction of Occurrence                                                                       : chr  "United States" "United States" "United States" "United States" ...
-    ##  $ Sex                                                                                              : chr  "M" "F" "Female" "Female" ...
-    ##  $ Race/Ethnicity                                                                                   : chr  "Other" "Other" "Other" "Other" ...
-    ##  $ AgeGroup                                                                                         : chr  "0-4 years" "25-34 years" "0-4 years" "5-14 years" ...
-    ##  $ AllCause                                                                                         : int  61 26 40 6 14 49 182 44 122 198 ...
-    ##  $ NaturalCause                                                                                     : int  52 8 35 4 2 42 162 28 45 100 ...
-    ##  $ Septicemia (A40-A41)                                                                             : int  0 0 0 1 0 0 4 1 0 1 ...
-    ##  $ Malignant neoplasms (C00-C97)                                                                    : int  1 1 0 0 0 0 2 8 7 29 ...
-    ##  $ Diabetes mellitus (E10-E14)                                                                      : int  0 0 0 0 0 0 0 1 1 6 ...
-    ##  $ Alzheimer disease (G30)                                                                          : int  0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ Influenza and pneumonia (J09-J18)                                                                : int  1 0 1 1 0 0 4 4 0 5 ...
-    ##  $ Chronic lower respiratory diseases (J40-J47)                                                     : int  0 0 0 0 0 0 0 1 2 2 ...
-    ##  $ Other diseases of respiratory system (J00-J06,J30-J39,J67,J70-J98)                               : int  1 0 0 0 0 0 1 0 1 3 ...
-    ##  $ Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)                            : int  0 0 0 0 0 0 0 0 2 0 ...
-    ##  $ Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified (R00-R99): int  6 0 7 0 1 6 22 0 4 2 ...
-    ##  $ Diseases of heart (I00-I09,I11,I13,I20-I51)                                                      : int  0 1 0 0 0 0 1 0 6 8 ...
-    ##  $ Cerebrovascular diseases (I60-I69)                                                               : int  1 1 0 0 0 0 0 0 1 2 ...
-    ##  $ COVID-19 (U071, Multiple Cause of Death)                                                         : int  0 0 0 0 0 1 0 0 0 0 ...
-    ##  $ COVID-19 (U071, Underlying Cause of Death)                                                       : int  0 0 0 0 0 1 0 0 0 0 ...
-    ##  - attr(*, ".internal.selfref")=<externalptr>
-
-## 
-
 Change the names of the key variables so that they are easier to refer
 to in the code.
 
@@ -417,7 +81,7 @@ to in the code.
 setnames(ah, old = c('Date Of Death Year', 'Date Of Death Month', 'Race/Ethnicity' ,'Septicemia (A40-A41)', 'Malignant neoplasms (C00-C97)', 'Diabetes mellitus (E10-E14)', 'Alzheimer disease (G30)', 'Influenza and pneumonia (J09-J18)', 'Chronic lower respiratory diseases (J40-J47)', 'Other diseases of respiratory system (J00-J06,J30-J39,J67,J70-J98)', 'Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)','Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified (R00-R99)', 'Diseases of heart (I00-I09,I11,I13,I20-I51)' ,'Cerebrovascular diseases (I60-I69)' ,'COVID-19 (U071, Multiple Cause of Death)' ,'COVID-19 (U071, Underlying Cause of Death)'), new = c('Y', 'M', 'Race', 'Septicemia', 'Tumor', 'Diabetes', 'Alzheimer', 'FluPneumonia', 'Lower_R','Other_R' ,'Nephrosis', 'Abnormal', 'Heart', 'Cerebrovascular', 'Covid_Multi' ,'Covid_Under'))
 ```
 
-Categorical Variables
+-   Check Categorical Variables
 
 ``` r
 ah$Year= format(ah$Y,format="%y")
@@ -575,9 +239,11 @@ table(ah$AgeGroup)
     ##   0-4  5-14 15-24 25-34 35-44 45-54 55-64 65-74 75-84  >=85 
     ##   396   396   396   396   396   396   396   396   396   396
 
--   Noted that sex, age, and race categories all have same sample size
+> Noted that sex, age, and race categories all have same sample size, so
+> the death counts could also be considered as the proportions, eligible
+> to be compared directly.
 
-Numerical Variables–\> meaningless?
+-   Check Numerical Variables
 
 ``` r
 summary(ah[,11:25])
@@ -612,9 +278,14 @@ summary(ah[,11:25])
     ##  3rd Qu.:  56.0   3rd Qu.:   37.0   3rd Qu.:   33.0  
     ##  Max.   :3483.0   Max.   :15441.0   Max.   :13510.0
 
-## Year–\> overall trends
+> Since the death counts were wide-ranged integers, it’s hard to
+> summarize the leading causes’ trends with the raw data. Thus, averages
+> of death counts should be calculated for further analysis.
 
-Calculate average death counts among different causes by year
+## 1. Overall Mortality Trends by Year
+
+Table 1 presented the average death counts among different causes by
+year.
 
 ``` r
 tab1= as.tibble(group_by(ah, Year) %>% 
@@ -628,16 +299,220 @@ tab1= as.tibble(group_by(ah, Year) %>%
     ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
 
 ``` r
-knitr::kable(tab1, caption= "Table 1. Summary of Average Death Counts for Leading Causes by Year")
+tab1 %>%
+  kbl(caption = "Table 1. Summary of Average Death Counts for Leading Causes by Year") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
 ```
 
-| Year | AllCause | NaturalCause | Septicemia |    Tumor | Diabetes | Alzheimer | FluPneumonia |   Lower_R |  Other_R | Nephrosis | Abnormal |    Heart | Cerebrovascular | Covid_Multi | Covid_Under |
-|:-----|---------:|-------------:|-----------:|---------:|---------:|----------:|-------------:|----------:|---------:|----------:|---------:|---------:|----------------:|------------:|------------:|
-| 2019 | 1982.424 |     1807.874 |   26.68750 | 416.3813 | 60.86389 |  84.37431 |     34.56944 | 109.00972 | 30.63194 |  35.80903 | 22.48056 | 457.6410 |        104.1667 |      0.0000 |      0.0000 |
-| 2020 | 2354.156 |     2155.908 |   27.86319 | 418.8139 | 71.03819 |  93.25069 |     37.26597 | 106.09444 | 31.37292 |  36.52708 | 23.76597 | 484.8611 |        111.4681 |    267.5396 |    244.0965 |
-| 2021 | 2277.359 |     2097.527 |   26.53611 | 404.3130 | 66.94722 |  79.40093 |     26.49722 |  93.01481 | 30.06852 |  35.70741 | 59.57500 | 451.7287 |        107.3963 |    300.2824 |    270.3046 |
-
+<table class=" lightable-classic" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
 Table 1. Summary of Average Death Counts for Leading Causes by Year
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Year
+</th>
+<th style="text-align:right;">
+AllCause
+</th>
+<th style="text-align:right;">
+NaturalCause
+</th>
+<th style="text-align:right;">
+Septicemia
+</th>
+<th style="text-align:right;">
+Tumor
+</th>
+<th style="text-align:right;">
+Diabetes
+</th>
+<th style="text-align:right;">
+Alzheimer
+</th>
+<th style="text-align:right;">
+FluPneumonia
+</th>
+<th style="text-align:right;">
+Lower_R
+</th>
+<th style="text-align:right;">
+Other_R
+</th>
+<th style="text-align:right;">
+Nephrosis
+</th>
+<th style="text-align:right;">
+Abnormal
+</th>
+<th style="text-align:right;">
+Heart
+</th>
+<th style="text-align:right;">
+Cerebrovascular
+</th>
+<th style="text-align:right;">
+Covid_Multi
+</th>
+<th style="text-align:right;">
+Covid_Under
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:right;">
+1982.424
+</td>
+<td style="text-align:right;">
+1807.874
+</td>
+<td style="text-align:right;">
+26.68750
+</td>
+<td style="text-align:right;">
+416.3813
+</td>
+<td style="text-align:right;">
+60.86389
+</td>
+<td style="text-align:right;">
+84.37431
+</td>
+<td style="text-align:right;">
+34.56944
+</td>
+<td style="text-align:right;">
+109.00972
+</td>
+<td style="text-align:right;">
+30.63194
+</td>
+<td style="text-align:right;">
+35.80903
+</td>
+<td style="text-align:right;">
+22.48056
+</td>
+<td style="text-align:right;">
+457.6410
+</td>
+<td style="text-align:right;">
+104.1667
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:right;">
+2354.156
+</td>
+<td style="text-align:right;">
+2155.908
+</td>
+<td style="text-align:right;">
+27.86319
+</td>
+<td style="text-align:right;">
+418.8139
+</td>
+<td style="text-align:right;">
+71.03819
+</td>
+<td style="text-align:right;">
+93.25069
+</td>
+<td style="text-align:right;">
+37.26597
+</td>
+<td style="text-align:right;">
+106.09444
+</td>
+<td style="text-align:right;">
+31.37292
+</td>
+<td style="text-align:right;">
+36.52708
+</td>
+<td style="text-align:right;">
+23.76597
+</td>
+<td style="text-align:right;">
+484.8611
+</td>
+<td style="text-align:right;">
+111.4681
+</td>
+<td style="text-align:right;">
+267.5396
+</td>
+<td style="text-align:right;">
+244.0965
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:right;">
+2277.359
+</td>
+<td style="text-align:right;">
+2097.527
+</td>
+<td style="text-align:right;">
+26.53611
+</td>
+<td style="text-align:right;">
+404.3130
+</td>
+<td style="text-align:right;">
+66.94722
+</td>
+<td style="text-align:right;">
+79.40093
+</td>
+<td style="text-align:right;">
+26.49722
+</td>
+<td style="text-align:right;">
+93.01481
+</td>
+<td style="text-align:right;">
+30.06852
+</td>
+<td style="text-align:right;">
+35.70741
+</td>
+<td style="text-align:right;">
+59.57500
+</td>
+<td style="text-align:right;">
+451.7287
+</td>
+<td style="text-align:right;">
+107.3963
+</td>
+<td style="text-align:right;">
+300.2824
+</td>
+<td style="text-align:right;">
+270.3046
+</td>
+</tr>
+</tbody>
+</table>
 
 Generate a new dataset of average death counts with cause category by
 year
@@ -662,9 +537,9 @@ f1= c1 %>%
 grid.arrange(f1, bottom="Figure 1. Trends in death counts by leading causes, from 2019 to 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
-Zoom in to present those causes with relatively small counts
+-   Zoom in to present those causes with relatively small counts
 
 ``` r
 z1= f1 +ylim(0, 500)
@@ -676,9 +551,9 @@ z1
 
     ## Warning: Removed 6 rows containing missing values (geom_point).
 
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
-## Month_total–\> more details
+## 2. Detailed Mortality Trends by Total Month
 
 Generate new variable for total months counts
 
@@ -695,10 +570,6 @@ table(ah$Month_total)
     ## 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 120 
     ##  21  22  23  24  25  26  27  28  29  30  31  32  33 
     ## 120 120 120 120 120 120 120 120 120 120 120 120 120
-
-``` r
-save= ah
-```
 
 Calculate average death counts among different causes by total month
 
@@ -731,9 +602,9 @@ f2= c2 %>%
 grid.arrange(f2, bottom="Figure 2. Trends in death counts by leading causes for totally 33 months (01/2019-09/2021).")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
-Zoom in to present those causes with relatively small counts
+-   Zoom in to present those causes with relatively small counts
 
 ``` r
 z2=f2 +ylim(0, 900)
@@ -745,29 +616,9 @@ z2
 
     ## Warning: Removed 66 rows containing missing values (geom_point).
 
-![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
-## delete
-
-``` r
-ggarrange(z1, z2, nrow=2, common.legend = TRUE, legend= "right")
-```
-
-    ## Warning: Removed 6 row(s) containing missing values (geom_path).
-
-    ## Warning: Removed 6 rows containing missing values (geom_point).
-
-    ## Warning: Removed 6 row(s) containing missing values (geom_path).
-
-    ## Warning: Removed 6 rows containing missing values (geom_point).
-
-    ## Warning: Removed 66 row(s) containing missing values (geom_path).
-
-    ## Warning: Removed 66 rows containing missing values (geom_point).
-
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
-
-For Covid Causes
+## 3. COVID-Caused Mortality Trends
 
 ``` r
 f3_1= subset(c1, Cause %in% "Covid_Multi" | Cause %in% "Covid_Under") %>%
@@ -792,12 +643,12 @@ f3_2= subset(c2, Cause %in% "Covid_Multi" | Cause %in% "Covid_Under") %>%
   theme_linedraw()
 
 f3= ggarrange(f3_1, f3_2, nrow=2, common.legend = TRUE, legend= "right")
-grid.arrange(f3, bottom="Figure 3. Trends in death counts by Covid-19, from Jan 2019 to Sep 2021.")
+grid.arrange(f3, bottom="Figure 3. Trends in death counts by COVID-19, from Jan 2019 to Sep 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
-## Now visualize Covid-caused death counts by sex, age, and race.
+## 4. Visualiztion of COVID-caused Death Counts by Sex, Age, and Race
 
 ### By sex
 
@@ -810,19 +661,272 @@ s= as.tibble(group_by(ah, Year, Sex) %>%
     ## argument.
 
 ``` r
-knitr::kable(s, caption= "Table 2. Summary of Covid-caused Average Death Counts by Sex")
+knitr::kable(s, caption= "Table 2. Summary of COVID-caused Average Death Counts by Sex")
 ```
 
-| Year | Sex | AllCause | Covid_Multi | Covid_Under |
-|:-----|:----|---------:|------------:|------------:|
-| 2019 | F   | 1918.015 |      0.0000 |      0.0000 |
-| 2019 | M   | 2046.833 |      0.0000 |      0.0000 |
-| 2020 | F   | 2243.901 |    244.4514 |    220.1292 |
-| 2020 | M   | 2464.411 |    290.6278 |    268.0639 |
-| 2021 | F   | 2137.974 |    264.1630 |    234.0370 |
-| 2021 | M   | 2416.744 |    336.4019 |    306.5722 |
+<table>
+<caption>
+Table 2. Summary of COVID-caused Average Death Counts by Sex
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Year
+</th>
+<th style="text-align:left;">
+Sex
+</th>
+<th style="text-align:right;">
+AllCause
+</th>
+<th style="text-align:right;">
+Covid_Multi
+</th>
+<th style="text-align:right;">
+Covid_Under
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:right;">
+1918.015
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:right;">
+2046.833
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:right;">
+2243.901
+</td>
+<td style="text-align:right;">
+244.4514
+</td>
+<td style="text-align:right;">
+220.1292
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:right;">
+2464.411
+</td>
+<td style="text-align:right;">
+290.6278
+</td>
+<td style="text-align:right;">
+268.0639
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:right;">
+2137.974
+</td>
+<td style="text-align:right;">
+264.1630
+</td>
+<td style="text-align:right;">
+234.0370
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:right;">
+2416.744
+</td>
+<td style="text-align:right;">
+336.4019
+</td>
+<td style="text-align:right;">
+306.5722
+</td>
+</tr>
+</tbody>
+</table>
 
-Table 2. Summary of Covid-caused Average Death Counts by Sex
+``` r
+s %>%
+  kbl(caption = "Table 2. Summary of COVID-caused Average Death Counts by Sex") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+```
+
+<table class=" lightable-classic" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Table 2. Summary of COVID-caused Average Death Counts by Sex
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Year
+</th>
+<th style="text-align:left;">
+Sex
+</th>
+<th style="text-align:right;">
+AllCause
+</th>
+<th style="text-align:right;">
+Covid_Multi
+</th>
+<th style="text-align:right;">
+Covid_Under
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:right;">
+1918.015
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:right;">
+2046.833
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:right;">
+2243.901
+</td>
+<td style="text-align:right;">
+244.4514
+</td>
+<td style="text-align:right;">
+220.1292
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:right;">
+2464.411
+</td>
+<td style="text-align:right;">
+290.6278
+</td>
+<td style="text-align:right;">
+268.0639
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:right;">
+2137.974
+</td>
+<td style="text-align:right;">
+264.1630
+</td>
+<td style="text-align:right;">
+234.0370
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:right;">
+2416.744
+</td>
+<td style="text-align:right;">
+336.4019
+</td>
+<td style="text-align:right;">
+306.5722
+</td>
+</tr>
+</tbody>
+</table>
 
 ``` r
 c_s= s %>% pivot_longer(cols = c(AllCause, Covid_Multi, Covid_Under),
@@ -855,10 +959,10 @@ f4_2= subset(c_s, Cause %in% "Covid_Under") %>%
   coord_flip() 
 
 f4= ggarrange(f4_1, f4_2, nrow=2, common.legend = TRUE, legend= "right")
-grid.arrange(f4, bottom="Figure 4. Covid-caused death counts by sex, from 2019 to 2021.")
+grid.arrange(f4, bottom="Figure 4. COVID-caused death counts by sex, from 2019 to 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 ### By age
 
@@ -871,43 +975,547 @@ a= as.tibble(group_by(ah, Year, AgeGroup) %>%
     ## argument.
 
 ``` r
-knitr::kable(a, caption= "Table 2. Summary of Covid-caused Average Death Counts by Age")
+a %>%
+  kbl(caption = "Table 3. Summary of COVID-caused Average Death Counts by Age") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
 ```
 
-| Year | AgeGroup |   AllCause | Covid_Multi | Covid_Under |
-|:-----|:---------|-----------:|------------:|------------:|
-| 2019 | 0-4      |  170.81250 |   0.0000000 |   0.0000000 |
-| 2019 | 5-14     |   38.17361 |   0.0000000 |   0.0000000 |
-| 2019 | 15-24    |  206.74306 |   0.0000000 |   0.0000000 |
-| 2019 | 25-34    |  410.95833 |   0.0000000 |   0.0000000 |
-| 2019 | 35-44    |  576.29167 |   0.0000000 |   0.0000000 |
-| 2019 | 45-54    | 1113.84028 |   0.0000000 |   0.0000000 |
-| 2019 | 55-64    | 2603.72917 |   0.0000000 |   0.0000000 |
-| 2019 | 65-74    | 3858.04861 |   0.0000000 |   0.0000000 |
-| 2019 | 75-84    | 4777.96528 |   0.0000000 |   0.0000000 |
-| 2019 | \>=85    | 6067.68056 |   0.0000000 |   0.0000000 |
-| 2020 | 0-4      |  161.00000 |   0.5347222 |   0.3750000 |
-| 2020 | 5-14     |   39.19444 |   0.4722222 |   0.3402778 |
-| 2020 | 15-24    |  250.10417 |   4.2638889 |   3.4791667 |
-| 2020 | 25-34    |  513.07639 |  18.1944444 |  15.7083333 |
-| 2020 | 35-44    |  729.06250 |  47.0694444 |  42.3402778 |
-| 2020 | 45-54    | 1333.21528 | 127.1875000 | 118.2291667 |
-| 2020 | 55-64    | 3069.50000 | 316.3263889 | 293.4305556 |
-| 2020 | 65-74    | 4693.91667 | 571.1875000 | 530.9513889 |
-| 2020 | 75-84    | 5715.49306 | 737.5277778 | 675.0347222 |
-| 2020 | \>=85    | 7037.00000 | 852.6319444 | 761.0763889 |
-| 2021 | 0-4      |  149.30556 |   1.0092593 |   0.6666667 |
-| 2021 | 5-14     |   38.60185 |   0.8981481 |   0.6203704 |
-| 2021 | 15-24    |  252.41667 |   9.0648148 |   7.7129630 |
-| 2021 | 25-34    |  538.61111 |  39.8148148 |  35.1203704 |
-| 2021 | 35-44    |  805.20370 |  98.8425926 |  91.1944444 |
-| 2021 | 45-54    | 1402.75000 | 235.6111111 | 220.8796296 |
-| 2021 | 55-64    | 3122.27778 | 489.8055556 | 454.9722222 |
-| 2021 | 65-74    | 4747.54630 | 717.7129630 | 660.5833333 |
-| 2021 | 75-84    | 5464.61111 | 746.8611111 | 667.2222222 |
-| 2021 | \>=85    | 6252.26852 | 663.2037037 | 564.0740741 |
-
-Table 2. Summary of Covid-caused Average Death Counts by Age
+<table class=" lightable-classic" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Table 3. Summary of COVID-caused Average Death Counts by Age
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Year
+</th>
+<th style="text-align:left;">
+AgeGroup
+</th>
+<th style="text-align:right;">
+AllCause
+</th>
+<th style="text-align:right;">
+Covid_Multi
+</th>
+<th style="text-align:right;">
+Covid_Under
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+0-4
+</td>
+<td style="text-align:right;">
+170.81250
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+5-14
+</td>
+<td style="text-align:right;">
+38.17361
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+15-24
+</td>
+<td style="text-align:right;">
+206.74306
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+25-34
+</td>
+<td style="text-align:right;">
+410.95833
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+35-44
+</td>
+<td style="text-align:right;">
+576.29167
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+45-54
+</td>
+<td style="text-align:right;">
+1113.84028
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+55-64
+</td>
+<td style="text-align:right;">
+2603.72917
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+65-74
+</td>
+<td style="text-align:right;">
+3858.04861
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+75-84
+</td>
+<td style="text-align:right;">
+4777.96528
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+\>=85
+</td>
+<td style="text-align:right;">
+6067.68056
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+0-4
+</td>
+<td style="text-align:right;">
+161.00000
+</td>
+<td style="text-align:right;">
+0.5347222
+</td>
+<td style="text-align:right;">
+0.3750000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+5-14
+</td>
+<td style="text-align:right;">
+39.19444
+</td>
+<td style="text-align:right;">
+0.4722222
+</td>
+<td style="text-align:right;">
+0.3402778
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+15-24
+</td>
+<td style="text-align:right;">
+250.10417
+</td>
+<td style="text-align:right;">
+4.2638889
+</td>
+<td style="text-align:right;">
+3.4791667
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+25-34
+</td>
+<td style="text-align:right;">
+513.07639
+</td>
+<td style="text-align:right;">
+18.1944444
+</td>
+<td style="text-align:right;">
+15.7083333
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+35-44
+</td>
+<td style="text-align:right;">
+729.06250
+</td>
+<td style="text-align:right;">
+47.0694444
+</td>
+<td style="text-align:right;">
+42.3402778
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+45-54
+</td>
+<td style="text-align:right;">
+1333.21528
+</td>
+<td style="text-align:right;">
+127.1875000
+</td>
+<td style="text-align:right;">
+118.2291667
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+55-64
+</td>
+<td style="text-align:right;">
+3069.50000
+</td>
+<td style="text-align:right;">
+316.3263889
+</td>
+<td style="text-align:right;">
+293.4305556
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+65-74
+</td>
+<td style="text-align:right;">
+4693.91667
+</td>
+<td style="text-align:right;">
+571.1875000
+</td>
+<td style="text-align:right;">
+530.9513889
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+75-84
+</td>
+<td style="text-align:right;">
+5715.49306
+</td>
+<td style="text-align:right;">
+737.5277778
+</td>
+<td style="text-align:right;">
+675.0347222
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+\>=85
+</td>
+<td style="text-align:right;">
+7037.00000
+</td>
+<td style="text-align:right;">
+852.6319444
+</td>
+<td style="text-align:right;">
+761.0763889
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+0-4
+</td>
+<td style="text-align:right;">
+149.30556
+</td>
+<td style="text-align:right;">
+1.0092593
+</td>
+<td style="text-align:right;">
+0.6666667
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+5-14
+</td>
+<td style="text-align:right;">
+38.60185
+</td>
+<td style="text-align:right;">
+0.8981481
+</td>
+<td style="text-align:right;">
+0.6203704
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+15-24
+</td>
+<td style="text-align:right;">
+252.41667
+</td>
+<td style="text-align:right;">
+9.0648148
+</td>
+<td style="text-align:right;">
+7.7129630
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+25-34
+</td>
+<td style="text-align:right;">
+538.61111
+</td>
+<td style="text-align:right;">
+39.8148148
+</td>
+<td style="text-align:right;">
+35.1203704
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+35-44
+</td>
+<td style="text-align:right;">
+805.20370
+</td>
+<td style="text-align:right;">
+98.8425926
+</td>
+<td style="text-align:right;">
+91.1944444
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+45-54
+</td>
+<td style="text-align:right;">
+1402.75000
+</td>
+<td style="text-align:right;">
+235.6111111
+</td>
+<td style="text-align:right;">
+220.8796296
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+55-64
+</td>
+<td style="text-align:right;">
+3122.27778
+</td>
+<td style="text-align:right;">
+489.8055556
+</td>
+<td style="text-align:right;">
+454.9722222
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+65-74
+</td>
+<td style="text-align:right;">
+4747.54630
+</td>
+<td style="text-align:right;">
+717.7129630
+</td>
+<td style="text-align:right;">
+660.5833333
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+75-84
+</td>
+<td style="text-align:right;">
+5464.61111
+</td>
+<td style="text-align:right;">
+746.8611111
+</td>
+<td style="text-align:right;">
+667.2222222
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+\>=85
+</td>
+<td style="text-align:right;">
+6252.26852
+</td>
+<td style="text-align:right;">
+663.2037037
+</td>
+<td style="text-align:right;">
+564.0740741
+</td>
+</tr>
+</tbody>
+</table>
 
 ``` r
 c_a= a %>% pivot_longer(cols = c(AllCause, Covid_Multi, Covid_Under),
@@ -938,10 +1546,10 @@ f5_2= subset(c_a, Cause %in% "Covid_Under") %>%
   theme_linedraw()
 
 f5= ggarrange(f5_1, f5_2, nrow=2, common.legend = TRUE, legend= "right")
-grid.arrange(f5, bottom="Figure 5. Covid-caused death counts by age, from 2019 to 2021.")
+grid.arrange(f5, bottom="Figure 5. COVID-caused death counts by age, from 2019 to 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 ### By race
 
@@ -954,31 +1562,679 @@ r= as.tibble(group_by(ah, Year, Race) %>%
     ## argument.
 
 ``` r
-knitr::kable(r, caption= "Table 4. Summary of Covid-caused Average Death Counts by Race")
+knitr::kable(r, caption= "")
 ```
 
-| Year | Race          |    AllCause | Covid_Multi | Covid_Under |
-|:-----|:--------------|------------:|------------:|------------:|
-| 2019 | Asian         |   293.87500 |     0.00000 |     0.00000 |
-| 2019 | Black         |  1444.40833 |     0.00000 |     0.00000 |
-| 2019 | Hispanic      |   884.94583 |     0.00000 |     0.00000 |
-| 2019 | Indian/Alaska |    75.23750 |     0.00000 |     0.00000 |
-| 2019 | Other         |    96.94583 |     0.00000 |     0.00000 |
-| 2019 | White         |  9099.13333 |     0.00000 |     0.00000 |
-| 2020 | Asian         |   381.62917 |    56.54583 |    53.07500 |
-| 2020 | Black         |  1875.12083 |   256.13750 |   235.21250 |
-| 2020 | Hispanic      |  1281.43750 |   289.31250 |   273.25000 |
-| 2020 | Indian/Alaska |   103.10833 |    19.23333 |    17.77917 |
-| 2020 | Other         |   122.26250 |    14.26250 |    13.17500 |
-| 2020 | White         | 10361.37917 |   969.74583 |   872.08750 |
-| 2021 | Asian         |   378.57778 |    62.75000 |    58.54444 |
-| 2021 | Black         |  1761.60000 |   253.45000 |   229.17222 |
-| 2021 | Hispanic      |  1290.42222 |   314.92778 |   296.87778 |
-| 2021 | Indian/Alaska |   100.41667 |    17.62222 |    16.15000 |
-| 2021 | Other         |   120.27222 |    15.22778 |    13.80556 |
-| 2021 | White         | 10012.86667 |  1137.71667 |  1007.27778 |
+<table>
+<caption>
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Year
+</th>
+<th style="text-align:left;">
+Race
+</th>
+<th style="text-align:right;">
+AllCause
+</th>
+<th style="text-align:right;">
+Covid_Multi
+</th>
+<th style="text-align:right;">
+Covid_Under
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+Asian
+</td>
+<td style="text-align:right;">
+293.87500
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+Black
+</td>
+<td style="text-align:right;">
+1444.40833
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+Hispanic
+</td>
+<td style="text-align:right;">
+884.94583
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+Indian/Alaska
+</td>
+<td style="text-align:right;">
+75.23750
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+Other
+</td>
+<td style="text-align:right;">
+96.94583
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+White
+</td>
+<td style="text-align:right;">
+9099.13333
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+Asian
+</td>
+<td style="text-align:right;">
+381.62917
+</td>
+<td style="text-align:right;">
+56.54583
+</td>
+<td style="text-align:right;">
+53.07500
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+Black
+</td>
+<td style="text-align:right;">
+1875.12083
+</td>
+<td style="text-align:right;">
+256.13750
+</td>
+<td style="text-align:right;">
+235.21250
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+Hispanic
+</td>
+<td style="text-align:right;">
+1281.43750
+</td>
+<td style="text-align:right;">
+289.31250
+</td>
+<td style="text-align:right;">
+273.25000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+Indian/Alaska
+</td>
+<td style="text-align:right;">
+103.10833
+</td>
+<td style="text-align:right;">
+19.23333
+</td>
+<td style="text-align:right;">
+17.77917
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+Other
+</td>
+<td style="text-align:right;">
+122.26250
+</td>
+<td style="text-align:right;">
+14.26250
+</td>
+<td style="text-align:right;">
+13.17500
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+White
+</td>
+<td style="text-align:right;">
+10361.37917
+</td>
+<td style="text-align:right;">
+969.74583
+</td>
+<td style="text-align:right;">
+872.08750
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+Asian
+</td>
+<td style="text-align:right;">
+378.57778
+</td>
+<td style="text-align:right;">
+62.75000
+</td>
+<td style="text-align:right;">
+58.54444
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+Black
+</td>
+<td style="text-align:right;">
+1761.60000
+</td>
+<td style="text-align:right;">
+253.45000
+</td>
+<td style="text-align:right;">
+229.17222
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+Hispanic
+</td>
+<td style="text-align:right;">
+1290.42222
+</td>
+<td style="text-align:right;">
+314.92778
+</td>
+<td style="text-align:right;">
+296.87778
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+Indian/Alaska
+</td>
+<td style="text-align:right;">
+100.41667
+</td>
+<td style="text-align:right;">
+17.62222
+</td>
+<td style="text-align:right;">
+16.15000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+Other
+</td>
+<td style="text-align:right;">
+120.27222
+</td>
+<td style="text-align:right;">
+15.22778
+</td>
+<td style="text-align:right;">
+13.80556
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+White
+</td>
+<td style="text-align:right;">
+10012.86667
+</td>
+<td style="text-align:right;">
+1137.71667
+</td>
+<td style="text-align:right;">
+1007.27778
+</td>
+</tr>
+</tbody>
+</table>
 
-Table 4. Summary of Covid-caused Average Death Counts by Race
+``` r
+r %>%
+  kbl(caption = "Table 4. Summary of COVID-caused Average Death Counts by Race") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+```
+
+<table class=" lightable-classic" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Table 4. Summary of COVID-caused Average Death Counts by Race
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Year
+</th>
+<th style="text-align:left;">
+Race
+</th>
+<th style="text-align:right;">
+AllCause
+</th>
+<th style="text-align:right;">
+Covid_Multi
+</th>
+<th style="text-align:right;">
+Covid_Under
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+Asian
+</td>
+<td style="text-align:right;">
+293.87500
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+Black
+</td>
+<td style="text-align:right;">
+1444.40833
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+Hispanic
+</td>
+<td style="text-align:right;">
+884.94583
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+Indian/Alaska
+</td>
+<td style="text-align:right;">
+75.23750
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+Other
+</td>
+<td style="text-align:right;">
+96.94583
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019
+</td>
+<td style="text-align:left;">
+White
+</td>
+<td style="text-align:right;">
+9099.13333
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+Asian
+</td>
+<td style="text-align:right;">
+381.62917
+</td>
+<td style="text-align:right;">
+56.54583
+</td>
+<td style="text-align:right;">
+53.07500
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+Black
+</td>
+<td style="text-align:right;">
+1875.12083
+</td>
+<td style="text-align:right;">
+256.13750
+</td>
+<td style="text-align:right;">
+235.21250
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+Hispanic
+</td>
+<td style="text-align:right;">
+1281.43750
+</td>
+<td style="text-align:right;">
+289.31250
+</td>
+<td style="text-align:right;">
+273.25000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+Indian/Alaska
+</td>
+<td style="text-align:right;">
+103.10833
+</td>
+<td style="text-align:right;">
+19.23333
+</td>
+<td style="text-align:right;">
+17.77917
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+Other
+</td>
+<td style="text-align:right;">
+122.26250
+</td>
+<td style="text-align:right;">
+14.26250
+</td>
+<td style="text-align:right;">
+13.17500
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+White
+</td>
+<td style="text-align:right;">
+10361.37917
+</td>
+<td style="text-align:right;">
+969.74583
+</td>
+<td style="text-align:right;">
+872.08750
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+Asian
+</td>
+<td style="text-align:right;">
+378.57778
+</td>
+<td style="text-align:right;">
+62.75000
+</td>
+<td style="text-align:right;">
+58.54444
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+Black
+</td>
+<td style="text-align:right;">
+1761.60000
+</td>
+<td style="text-align:right;">
+253.45000
+</td>
+<td style="text-align:right;">
+229.17222
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+Hispanic
+</td>
+<td style="text-align:right;">
+1290.42222
+</td>
+<td style="text-align:right;">
+314.92778
+</td>
+<td style="text-align:right;">
+296.87778
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+Indian/Alaska
+</td>
+<td style="text-align:right;">
+100.41667
+</td>
+<td style="text-align:right;">
+17.62222
+</td>
+<td style="text-align:right;">
+16.15000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+Other
+</td>
+<td style="text-align:right;">
+120.27222
+</td>
+<td style="text-align:right;">
+15.22778
+</td>
+<td style="text-align:right;">
+13.80556
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+White
+</td>
+<td style="text-align:right;">
+10012.86667
+</td>
+<td style="text-align:right;">
+1137.71667
+</td>
+<td style="text-align:right;">
+1007.27778
+</td>
+</tr>
+</tbody>
+</table>
 
 ``` r
 c_r= r %>% pivot_longer(cols = c(AllCause, Covid_Multi, Covid_Under),
@@ -1009,7 +2265,11 @@ f6_2= subset(c_r, Cause %in% "Covid_Under") %>%
   theme_linedraw()
 
 f6= ggarrange(f6_1, f6_2, nrow=2, common.legend = TRUE, legend= "right")
-grid.arrange(f6, bottom="Figure 6. Covid-caused death counts by race, from 2019 to 2021.")
+grid.arrange(f6, bottom="Figure 6. COVID-caused death counts by race, from 2019 to 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+
+# Conclusion
+
+limitations: no proportion, only us,
