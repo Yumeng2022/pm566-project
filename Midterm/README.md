@@ -543,10 +543,12 @@ f1= c1 %>%
 grid.arrange(f1, bottom="Figure 1. Trends in average death counts by leading causes, from 2019 to 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- --> From Figure
-1, the top 3 causes of death were: natural cause, heart disease, and
-malignant neoplasms. As stated before, they all have remained relatively
-stable, except the drastic increase of COVID-caused death counts.
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+From Figure 1, the top 3 causes of death were: natural cause, heart
+disease, and malignant neoplasms. As stated before, they all have
+remained relatively stable, except the drastic increase of COVID-caused
+death counts.
 
 ## 2. Detailed Mortality Trends by Total Month
 
@@ -594,18 +596,19 @@ f2= c2 %>%
   scale_x_continuous(name= "Total Month", breaks = seq(1, 33, by = 1)) +
   theme_linedraw()
 
-grid.arrange(f2, bottom="Figure 2. Trends in average death counts by leading causes for totally 33 months (01/2019-09/2021).")
+grid.arrange(f2, bottom="Figure 2. Trends in average death counts by leading causes for totally 33 months.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- --> To present
-more detailed information of monthly counts of deaths, a new variable of
-total month was created. Figure 2 showed the detailed tendency of all 15
-kinds of leading causes during the 33 month. The trend of natural cause
-line were similar to the all causes line and the difference between
-their death counts at all months were pretty small, indicating that
-natural cause was the most major cause of death. Still, Multiple and
-underlying COVID-19 causes showed a different pattern than all other
-causes.
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+To present more detailed information of monthly counts of deaths, a new
+variable of total month was created. Figure 2 showed the detailed
+tendency of all 15 kinds of leading causes during the 33 month. The
+trend of natural cause line were similar to the all causes line and the
+difference between their death counts at all months were pretty small,
+indicating that natural cause was the most major cause of death. Still,
+Multiple and underlying COVID-19 causes showed a different pattern than
+all other causes.
 
 ## 3. COVID-Caused Mortality Trends
 
@@ -635,11 +638,12 @@ f3= ggarrange(f3_1, f3_2, nrow=2, common.legend = TRUE, legend= "right")
 grid.arrange(f3, bottom="Figure 3. Trends in average death counts by COVID-19, from Jan 2019 to Sep 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- --> Narrowed
-down to COVID-19 causes, Figure 3 clearly showed that before month 14
-(Feb 2020), there was no COVID-19-attributed mortality in the US. Then
-for both causes, death counts started to increase from Feb 2020, the
-highest peak was at month 25 (Jan 2021).
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+Narrowing down to COVID-19 causes, Figure 3 clearly showed that before
+month 14 (Feb 2020), there was no COVID-19-attributed mortality in the
+US. Then for both causes, death counts started to increase from Feb
+2020, the highest peak was at month 25 (Jan 2021).
 
 ## 4. Visualiztion of COVID-caused Death Counts by Sex, Age, and Race
 
@@ -825,11 +829,12 @@ f4= ggarrange(f4_1, f4_2, nrow=2, common.legend = TRUE, legend= "right")
 grid.arrange(f4, bottom="Figure 4. COVID-caused average death counts by sex, from 2019 to 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- --> Based on
-Table 2 and Figure 4, females have smaller COVID-caused average death
-counts than males in 2020 and 2021. The all_cause factor had the same
-results, indicating the higher risk of dying from COVID-19 of men than
-women.
+![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+
+Based on Table 2 and Figure 4, females have smaller COVID-caused average
+death counts than males in 2020 and 2021. The all_cause factor had the
+same results, indicating the higher risk of dying from COVID-19 of men
+than women.
 
 ### By age
 
@@ -1416,11 +1421,12 @@ f5= ggarrange(f5_1, f5_2, nrow=2, common.legend = TRUE, legend= "right")
 grid.arrange(f5, bottom="Figure 5. COVID-caused average death counts by age, from 2019 to 2021.")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- --> Based on
-Table 3 and Figure 5, the overall pattern was: COVID-caused average
-death counts increased with age. In 2021, the equals to or older than 85
-years old group got smaller counts than 75-84 years old group. This
-required future analysis.
+![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+
+Based on Table 3 and Figure 5, the overall pattern was: COVID-caused
+average death counts increased with age. In 2021, the equals to or older
+than 85 years old group got smaller counts than 75-84 years old group.
+This required future analysis.
 
 ### By race
 
@@ -1820,6 +1826,6 @@ natural cause, heart disease, and tumor. The COVID-caused mortality
 started at Feb 2020 and reached it peak at Jan 2021.For different sex,
 age, and race groups, there were obvious difference of average
 COVID-caused death counts. Females tended to had smaller average death
-counts than males, Elder people tended to had higher average mortality
+counts than males, elder people tended to had higher average mortality
 than young people. White people got the highest average death counts,
 while Indian/ Alaska Native and Other had smallest mortality.
